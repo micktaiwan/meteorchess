@@ -1,0 +1,37 @@
+<template name="openGames">
+
+  <h2>Playing games</h2>
+  <div class="games">
+    {{#each playingGames}}
+      {{> playingGame }}
+    {{/each}}
+  </div>
+
+  <h2>Opengames</h2>
+  <div class="games">
+    {{#each openGames}}
+      {{> openGame }}
+    {{/each}}
+  </div>
+
+</template>
+
+<template name="openGame">
+
+  <div class="game">
+    <button class="btn btn-primary btn-xs accept">Accept</button>
+    {{user.name}}
+    <span class="date" data-livestamp="{{createdAt}}"></span>
+  </div>
+
+</template>
+
+<template name="playingGame">
+
+  <div class="game">
+    <button class="btn btn-default btn-xs open">Open</button>
+    {{user.name}}
+    <span class="date" data-livestamp="{{startedAt}}"></span>
+  </div>
+
+</template>
