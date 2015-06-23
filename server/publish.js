@@ -9,3 +9,7 @@ Meteor.publish('games-open', function() {
 Meteor.publish('game', function(id) {
   return Games.find({_id: id});
 });
+
+Meteor.publish('game-moves', function(id) {
+  return Moves.find({game_id: id}, {sort: {ply: 1}});
+});

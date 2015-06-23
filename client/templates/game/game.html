@@ -2,7 +2,9 @@
 
   <div class="row">
     <div class="col-xs-3">
-      <div id="status"></div>
+      <div>Game started <span class="date" data-livestamp="{{startedAt}}"></span></div>
+      <div>Last move <span class="date" data-livestamp="{{lastMovedAt}}"></span></div>
+      <div id="status" class="game-status"></div>
     </div>
 
     <div class="col-xs-5">
@@ -17,8 +19,8 @@
     </div>
 
     <div class="col-xs-4">
-      <div>FEN: <span id="fen"></span></div>
-      <div>PGN: <span id="pgn"></span></div>
+      <div>FEN: {{fen}}</div>
+      <div class="pgn">{{pgn}}</div>
     </div>
   </div>
 

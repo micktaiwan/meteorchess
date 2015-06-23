@@ -1,18 +1,28 @@
-var board, game, statusEl, fenEl, pgnEl;
+var board, game, chess, game_id, statusEl, fenEl, pgnEl;
+
+var mySide = function() {
+  if(game.white._id === Meteor.userId()) return 'w';
+  if(game.black._id === Meteor.userId()) return 'b';
+  return 'none';
+};
 
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
-  if(game.game_over() === true ||
-    (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-    (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+  var turn = chess.turn();
+
+  if(turn !== mySide()) return false;
+
+  if(chess.game_over() === true ||
+    (turn === 'w' && piece.search(/^b/) !== -1) ||
+    (turn === 'b' && piece.search(/^w/) !== -1)) {
     return false;
   }
 };
 
 var onDrop = function(source, target) {
   // see if the move is legal
-  var move = game.move({
+  var move = chess.move({
     from: source,
     to: target,
     promotion: 'q' // NOTE: always promote to a queen for example simplicity
@@ -20,33 +30,32 @@ var onDrop = function(source, target) {
 
   // illegal move
   if(move === null) return 'snapback';
-
   updateStatus();
+  Meteor.call('gameMove', game_id, move, chess.fen(), chess.pgn(), chess.game_over());
 };
-
 
 // update the board position after the piece snap
 // for castling, en passant, pawn promotion
 var onSnapEnd = function() {
-  board.position(game.fen());
+  board.position(chess.fen());
 };
 
 var updateStatus = function() {
   var status = '';
 
   var moveColor = 'White';
-  if(game.turn() === 'b') {
+  if(chess.turn() === 'b') {
     moveColor = 'Black';
   }
 
   // checkmate?
-  if(game.in_checkmate() === true) {
+  if(chess.in_checkmate() === true) {
     status = 'Game over, ' + moveColor + ' is in checkmate.';
   }
 
   // draw?
-  else if(game.in_draw() === true) {
-    status = 'Game over, drawn position';
+  else if(chess.in_draw() === true) {
+    status = 'Game is drawn';
   }
 
   // game still on
@@ -54,24 +63,23 @@ var updateStatus = function() {
     status = moveColor + ' to move';
 
     // check?
-    if(game.in_check() === true) {
+    if(chess.in_check() === true) {
       status += ', ' + moveColor + ' is in check';
     }
   }
   console.log(status);
   statusEl.html(status);
-  fenEl.html(game.fen());
-  pgnEl.html(game.pgn());
+
 };
 
 
 Template.game.rendered = function() {
 
   console.log(this.data);
-  game = new Chess();
+  chess = new Chess();
+  game_id = this.data._id;
+  game = this.data;
   statusEl = $('#status');
-  fenEl = $('#fen');
-  pgnEl = $('#pgn');
 
   var orientation = this.data.white._id === Meteor.userId() ? 'white' : 'black';
   var cfg = {
@@ -86,12 +94,22 @@ Template.game.rendered = function() {
   board = new ChessBoard('board', cfg);
   updateStatus();
 
+  Deps.autorun(function() {
+    (function() {
+      Moves.find({game_id: game_id}).observeChanges({
+        added: function(id, doc) {
+          console.log('new move', doc);
+          chess.move(doc.move);
+          board.position(chess.fen());
+          updateStatus();
+        }
+      });
+    })();
+  });
 
-  $(window).resize(board.resize); // FIXME
 };
 
 Template.game.helpers({
-
 
   topName: function() {
     return this.white._id === Meteor.userId() ? this.black.name : this.white.name;
@@ -99,9 +117,26 @@ Template.game.helpers({
 
   bottomName: function() {
     return this.white._id === Meteor.userId() ? this.white.name : this.black.name;
+  },
+  moves: function() {
+    return _.map(this.moves, function(m) {
+      return m.san + " ";
+    });
+  },
+  fen: function() {
+    return this.fen;
+  },
+  pgn: function() {
+    return this.pgn;
   }
 
 });
 
-Template.game.events({});
+Template.game.events({
+
+  'drop': function(e, tpl) {
+    console.log('drop', e, tpl);
+  }
+
+});
 

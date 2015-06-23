@@ -27,6 +27,21 @@ Meteor.methods({
         startedAt: new Date()
       }
     });
+  },
+
+  'gameMove': function(game_id, move, fen, pgn, game_over) {
+    console.log(game_id, move, fen);
+    var ply = Moves.find({game_id: game_id}).count() + 1;
+    var to_play = move.color === 'w' ? 'b' : 'w';
+    Moves.insert({
+      game_id: game_id,
+      move: move,
+      fen: fen,
+      ply: ply
+    });
+    var arr = {fen: fen, ply: ply, pgn: pgn, to_play: to_play, lastMovedAt: new Date()};
+    if(game_over) _.extend(arr, {status: 'ended'});
+    Games.update({_id: game_id}, {$set: arr, $push: {moves: move}})
   }
 
 });
