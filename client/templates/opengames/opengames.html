@@ -7,12 +7,20 @@
     {{/each}}
   </div>
 
-  <h2>Opengames</h2>
+  <h2>Open games</h2>
   <div class="games">
     {{#each openGames}}
       {{> openGame }}
     {{/each}}
   </div>
+
+  <h2>Ended games</h2>
+  <div class="games">
+    {{#each endedGames}}
+      {{> playingGame }}
+    {{/each}}
+  </div>
+
 
 </template>
 

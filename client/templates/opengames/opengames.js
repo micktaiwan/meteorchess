@@ -10,6 +10,10 @@ Template.openGames.helpers({
 
   'playingGames': function() {
     return Games.find({status: 'playing'}, {sort: {createdAt: 1}});
+  },
+
+  'endedGames': function() {
+    return Games.find({status: 'ended'}, {sort: {createdAt: 1}});
   }
 });
 

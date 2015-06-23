@@ -162,11 +162,17 @@ Template.game.rendered = function() {
           chess.move(doc.move);
           board.position(chess.fen());
           updateStatus();
-          if(!initializing && Session.get('notif-' + game._id) === true && !mePlayed(doc.move))
-            new Notification("Move", {
+          if(!initializing && Session.get('notif-' + game._id) === true && !mePlayed(doc.move)) {
+            var n = new Notification(game.white.name + " - " + game.black.name, {
               body: doc.move.san,
               icon: "http://learningchess.meteor.com/img/chesspieces/wikipedia/wN.png"
             });
+            /*            n.url = "http://learnchess.meteor.com/game/"+game._id;
+             n.onclick = function (e) {
+             location.href = n.url;
+             n.close();
+             }*/
+          }
         }
       });
       initializing = false;
