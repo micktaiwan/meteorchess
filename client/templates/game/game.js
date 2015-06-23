@@ -116,6 +116,11 @@ var onMoveEnd = function() {
   boardEl.find('.square-' + squareToHighlight).addClass('highlight-move');
 };
 
+var mePlayed = function(move) {
+  console.log('move', move);
+  return mySide() === move.color;
+};
+
 Template.game.rendered = function() {
 
   console.log(this.data);
@@ -145,6 +150,7 @@ Template.game.rendered = function() {
 
   Deps.autorun(function() {
     (function() {
+      var initializing = true;
       Moves.find({game_id: game_id}).observeChanges({
         added: function(id, doc) {
           //console.log('new move', doc);
@@ -156,8 +162,14 @@ Template.game.rendered = function() {
           chess.move(doc.move);
           board.position(chess.fen());
           updateStatus();
+          if(!initializing && Session.get('notif-' + game._id) === true && !mePlayed(doc.move))
+            new Notification("Move", {
+              body: doc.move.san,
+              icon: "http://learningchess.meteor.com/img/chesspieces/wikipedia/wN.png"
+            });
         }
       });
+      initializing = false;
     })();
   });
 
@@ -200,7 +212,19 @@ Template.game.events({
     console.log(tpl.$('#chatMsg').val());
     Meteor.call('chatInsert', this._id, tpl.$('#chatMsg').val());
     tpl.$('#chatMsg').val('');
+  },
+
+  'click .getNotif': function(e, tpl) {
+    console.log(e, tpl.$('.getNotif').is(":checked"));
+    if(tpl.$('.getNotif').is(":checked")) {
+      Notification.requestPermission(function(status) {
+        console.log('notif', status);
+      });
+      Session.set('notif-' + this._id, true);
+    }
+    else Session.set('notif-' + this._id, false);
   }
 
-});
+})
+;
 
