@@ -165,6 +165,10 @@ Template.game.rendered = function() {
 
 Template.game.helpers({
 
+  chats: function() {
+    return Chats.find({gameId: this._id}, {sort: {createdAt: 1}});
+  },
+
   topName: function() {
     return this.white._id === Meteor.userId() ? this.black.name : this.white.name;
   },
@@ -190,6 +194,12 @@ Template.game.events({
 
   'drop': function(e, tpl) {
     console.log('drop', e, tpl);
+  },
+  'submit': function(e, tpl) {
+    e.preventDefault();
+    console.log(tpl.$('#chatMsg').val());
+    Meteor.call('chatInsert', this._id, tpl.$('#chatMsg').val());
+    tpl.$('#chatMsg').val('');
   }
 
 });

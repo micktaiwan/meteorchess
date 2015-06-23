@@ -13,3 +13,7 @@ Meteor.publish('game', function(id) {
 Meteor.publish('game-moves', function(id) {
   return Moves.find({game_id: id}, {sort: {ply: 1}});
 });
+
+Meteor.publish('chats', function(id) {
+  return Chats.find({gameId: id}, {limit: 100});
+});

@@ -17,9 +17,22 @@ Template.openGame.helpers({
 
   'hideIfMyGame': function() {
     return this.user._id === Meteor.userId() ? 'hidden' : '';
+  },
+
+  'myGameClass': function() {
+    return (this.white._id === Meteor.userId() || this.black._id === Meteor.userId()) ? 'mygame' : '';
   }
 
 });
+
+Template.playingGame.helpers({
+
+  'myGameClass': function() {
+    return (this.white._id === Meteor.userId() || this.black._id === Meteor.userId()) ? 'mygame' : '';
+  }
+
+});
+
 
 Template.openGame.events({
 

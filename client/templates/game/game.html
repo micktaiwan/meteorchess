@@ -5,6 +5,20 @@
       <div>Game started <span class="date" data-livestamp="{{startedAt}}"></span></div>
       <div>Last move <span class="date" data-livestamp="{{lastMovedAt}}"></span></div>
       <div id="status" class="game-status"></div>
+      <div class="chatRoom">
+        <h2>Chat</h2>
+
+        <div class="chats">
+          {{#each chats}}
+            {{> chatMsg }}
+          {{/each}}
+        </div>
+        <form>
+          <input id="chatMsg"/>
+          <button type="submit" class="btn btn-primary btn-xs">Send</button>
+        </form>
+      </div>
+
     </div>
 
     <div class="col-xs-5">
@@ -24,4 +38,8 @@
     </div>
   </div>
 
+</template>
+
+<template name="chatMsg">
+  <div>{{user.name}}: {{msg}}</div>
 </template>

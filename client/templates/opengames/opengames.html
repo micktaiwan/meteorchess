@@ -18,7 +18,7 @@
 
 <template name="openGame">
 
-  <div class="game">
+  <div class="game {{myGameClass}}">
     <button class="btn btn-primary btn-xs accept {{hideIfMyGame}}">Accept</button>
     {{user.name}}
     <span class="date" data-livestamp="{{createdAt}}"></span>
@@ -29,7 +29,7 @@
 <template name="playingGame">
 
   <div class="game">
-    <button class="btn btn-default btn-xs open">Open</button>
+    <button class="btn btn-default btn-xs open {{myGameClass}}">Open</button>
     {{white.name}} - {{black.name}}
     <span class="date" data-livestamp="{{startedAt}}"></span>
   </div>
