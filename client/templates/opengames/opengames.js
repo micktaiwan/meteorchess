@@ -24,7 +24,7 @@ Template.openGame.helpers({
   },
 
   'myGameClass': function() {
-    return (this.white._id === Meteor.userId() || this.black._id === Meteor.userId()) ? 'mygame' : '';
+    return (this.user._id === Meteor.userId()) ? 'mygame' : '';
   }
 
 });
@@ -45,9 +45,14 @@ Template.playingGame.helpers({
 
 Template.openGame.events({
 
-  'click .accept': function() {
+  'click .accept': function(e) {
+    e.stopPropagation();
     var id = this._id;
     console.log('accept', id);
+    if(!Meteor.userId()) {
+      $('#login-dropdown-list').find('[data-toggle=dropdown]').dropdown('toggle');
+      return;
+    }
     Meteor.call('gameAccept', id, function(err, rv) {
       console.log('rv', rv, id, err);
       if(!err) Router.go('game', {id: id});
