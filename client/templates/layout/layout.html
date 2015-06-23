@@ -1,7 +1,7 @@
 <template name="layout">
 
   <nav class="navbar navbar-default">
-    <a class="navbar-brand" href="#">Learn Chess</a>
+    <a class="navbar-brand" href="/"><i class="fa fa-graduation-cap"></i> Learn Chess</a>
 
     <div class="nav navbar-nav navbar-right">
       {{> loginButtons}}
@@ -9,6 +9,8 @@
 
   </nav>
 
-  {{>yield}}
+  <div class="container">
+    {{>yield}}
+  </div>
 
 </template>

@@ -1,8 +1,10 @@
-var board, game, chess, game_id, statusEl, fenEl, pgnEl;
+var board, boardEl, game, chess, game_id, statusEl, fenEl, pgnEl;
+var squareToHighlight, squareClass = 'square-55d63';
 
 var mySide = function() {
-  if(game.white._id === Meteor.userId()) return 'w';
-  if(game.black._id === Meteor.userId()) return 'b';
+  var id = Meteor.userId();
+  if(game.white._id === id) return 'w';
+  if(game.black._id === id) return 'b';
   return 'none';
 };
 
@@ -72,6 +74,47 @@ var updateStatus = function() {
 
 };
 
+var removeGreySquares = function() {
+  $('#board .square-55d63').css('background', '');
+};
+
+var greySquare = function(square) {
+  var squareEl = $('#board .square-' + square);
+
+  var background = '#a9a9a9';
+  if(squareEl.hasClass('black-3c85d') === true) {
+    background = '#696969';
+  }
+
+  squareEl.css('background', background);
+};
+
+var onMouseoverSquare = function(square, piece) {
+  // get list of possible moves for this square
+  var moves = chess.moves({
+    square: square,
+    verbose: true
+  });
+
+  // exit if there are no moves available for this square
+  if(moves.length === 0) return;
+
+  // highlight the square they moused over
+  greySquare(square);
+
+  // highlight the possible squares for this piece
+  for(var i = 0; i < moves.length; i++) {
+    greySquare(moves[i].to);
+  }
+};
+
+var onMouseoutSquare = function(square, piece) {
+  removeGreySquares();
+};
+
+var onMoveEnd = function() {
+  boardEl.find('.square-' + squareToHighlight).addClass('highlight-move');
+};
 
 Template.game.rendered = function() {
 
@@ -80,6 +123,7 @@ Template.game.rendered = function() {
   game_id = this.data._id;
   game = this.data;
   statusEl = $('#status');
+  boardEl = $('#board');
 
   var orientation = this.data.white._id === Meteor.userId() ? 'white' : 'black';
   var cfg = {
@@ -88,6 +132,9 @@ Template.game.rendered = function() {
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd,
+    onMoveEnd: onMoveEnd,
+    onMouseoutSquare: onMouseoutSquare,
+    onMouseoverSquare: onMouseoverSquare,
     pieceTheme: '/img/chesspieces/wikipedia/{piece}.png',
     orientation: orientation
   };
@@ -98,7 +145,12 @@ Template.game.rendered = function() {
     (function() {
       Moves.find({game_id: game_id}).observeChanges({
         added: function(id, doc) {
-          console.log('new move', doc);
+          //console.log('new move', doc);
+          // Highlight
+          boardEl.find('.' + squareClass).removeClass('highlight-move');
+          boardEl.find('.square-' + doc.move.from).addClass('highlight-move');
+          squareToHighlight = doc.move.to;
+          // move
           chess.move(doc.move);
           board.position(chess.fen());
           updateStatus();

@@ -11,6 +11,13 @@ Template.openGames.helpers({
   'playingGames': function() {
     return Games.find({status: 'playing'}, {sort: {createdAt: 1}});
   }
+});
+
+Template.openGame.helpers({
+
+  'hideIfMyGame': function() {
+    return this.user._id === Meteor.userId() ? 'hidden' : '';
+  }
 
 });
 
