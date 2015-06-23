@@ -28,10 +28,10 @@
 
 <template name="playingGame">
 
-  <div class="game">
+  <div class="game {{meToPlayClass}}">
     <button class="btn btn-default btn-xs open {{myGameClass}}">Open</button>
     {{white.name}} - {{black.name}}
-    <span class="date" data-livestamp="{{startedAt}}"></span>
+    <span class="date" data-livestamp="{{lastMovedAt}}"></span>
   </div>
 
 </template>

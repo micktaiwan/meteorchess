@@ -29,6 +29,11 @@ Template.playingGame.helpers({
 
   'myGameClass': function() {
     return (this.white._id === Meteor.userId() || this.black._id === Meteor.userId()) ? 'mygame' : '';
+  },
+
+  'meToPlayClass': function() {
+    return ((this.white._id === Meteor.userId() && this.to_play === 'w') ||
+    (this.black._id === Meteor.userId() && this.to_play === 'b'))? 'meToPlay' : '';
   }
 
 });
