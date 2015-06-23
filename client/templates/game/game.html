@@ -1,11 +1,25 @@
 <template name="game">
 
-  <div class="game-container">
-    <div class="playerName">{{topName }}</div>
-    <div class="board-container">
-      <div id="board" style="width: 500px"></div>
+  <div class="row">
+    <div class="col-xs-3">
+      <div id="status"></div>
     </div>
-    <div class="playerName">{{bottomName }}</div>
+
+    <div class="col-xs-5">
+      <div class="game-container">
+        <div class="playerName">{{topName }}</div>
+        <div class="board-container">
+          <div id="board" style="width: 500px"></div>
+        </div>
+        <div class="playerName">{{bottomName }}</div>
+
+      </div>
+    </div>
+
+    <div class="col-xs-4">
+      <div>FEN: <span id="fen"></span></div>
+      <div>PGN: <span id="pgn"></span></div>
+    </div>
   </div>
 
 </template>
