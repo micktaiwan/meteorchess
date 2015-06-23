@@ -9,7 +9,7 @@ Meteor.methods({
     var name = getUserName(Meteor.users.findOne(this.userId));
     return Games.insert({
       user: {_id: this.userId, name: name},
-      players: [{_id: this.userId, name: name, color: 'w'}],
+      white: {_id: this.userId, name: name},
       status: 'open',
       rated: rated === "true",
       createdAt: new Date()
@@ -23,10 +23,8 @@ Meteor.methods({
     return Games.update({_id: id}, {
       $set: {
         status: 'playing',
+        black: {_id: this.userId, name: name},
         startedAt: new Date()
-      },
-      $push: {
-        players: {_id: this.userId, name: name, color: 'b'}
       }
     });
   }

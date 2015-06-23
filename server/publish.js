@@ -3,5 +3,9 @@
  */
 
 Meteor.publish('games-open', function() {
-  return Games.find({});
+  return Games.find({}); // FIXME
+});
+
+Meteor.publish('game', function(id) {
+  return Games.find({_id: id});
 });
