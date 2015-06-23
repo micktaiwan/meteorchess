@@ -125,7 +125,9 @@ Template.game.rendered = function() {
   statusEl = $('#status');
   boardEl = $('#board');
 
-  var orientation = this.data.white._id === Meteor.userId() ? 'white' : 'black';
+  var orientation = 'white';
+  if(Meteor.userId() && this.data.black._id === Meteor.userId()) orientation = 'black';
+
   var cfg = {
     draggable: true,
     position: 'start',
