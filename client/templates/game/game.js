@@ -167,11 +167,8 @@ Template.game.rendered = function() {
               body: doc.move.san,
               icon: "http://learningchess.meteor.com/img/chesspieces/wikipedia/wN.png"
             });
-            /*            n.url = "http://learnchess.meteor.com/game/"+game._id;
-             n.onclick = function (e) {
-             location.href = n.url;
-             n.close();
-             }*/
+            n.onclick = function(e) { window.focus(); this.cancel(); };
+            n.show();
           }
         }
       });
