@@ -13,8 +13,9 @@ var mySide = function() {
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
-  var turn = chess.turn();
+  if(game.status === 'ended') return false;
 
+  var turn = chess.turn();
   if(turn !== mySide()) return false;
 
   if(chess.game_over() === true ||
@@ -35,7 +36,14 @@ var onDrop = function(source, target) {
   // illegal move
   if(move === null) return 'snapback';
   updateStatus();
-  Meteor.call('gameMove', game_id, move, chess.fen(), chess.pgn(), chess.game_over());
+  var result = undefined;
+  // checkmate?
+  if(chess.in_checkmate() === true)
+    result = 'checkmate';
+  else if(chess.in_draw() === true)
+    result = 'draw';
+
+  Meteor.call('gameMove', game_id, move, chess.fen(), chess.pgn(), chess.game_over(), result);
 };
 
 // update the board position after the piece snap
@@ -56,7 +64,10 @@ var updateStatus = function() {
   if(chess.in_checkmate() === true) {
     status = 'Game over, ' + moveColor + ' is in checkmate.';
   }
-
+  // stalemate?
+  else if(chess.in_stalemate() === true) {
+    status = 'Stalemate. Game is drawn';
+  }
   // draw?
   else if(chess.in_draw() === true) {
     status = 'Game is drawn';
@@ -70,6 +81,11 @@ var updateStatus = function() {
     if(chess.in_check() === true) {
       status += ', ' + moveColor + ' is in check';
     }
+    // threefold repetition?
+    if(chess.in_threefold_repetition() === true) {
+      status += ', threefold repetition';
+    }
+
   }
   statusEl.html(status);
 
@@ -91,6 +107,8 @@ var greySquare = function(square) {
 };
 
 var onMouseoverSquare = function(square, piece) {
+  if(game.status === 'ended') return;
+
   // get list of possible moves for this square
   var moves = chess.moves({
     square: square,
@@ -206,6 +224,9 @@ Template.game.helpers({
   },
   pgn: function() {
     return this.pgn;
+  },
+  hiddenIfEnded: function() {
+    return this.status === 'ended' ? 'hidden' : '';
   }
 
 });
@@ -227,6 +248,13 @@ Template.game.events({
       Session.set('notif-' + this._id, true);
     }
     else Session.set('notif-' + this._id, false);
+  },
+
+  'click .resign': function(e, tpl) {
+    console.log('resiging');
+    if(confirm('Resign this game ?')) {
+      Meteor.call('gameResign', this._id);
+    }
   }
 
 })
