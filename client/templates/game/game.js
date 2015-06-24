@@ -1,5 +1,7 @@
 var board, boardEl, game, chess, game_id, statusEl, fenEl, pgnEl;
 var squareToHighlight, squareClass = 'square-55d63';
+var rendered = false;
+var onChangeHandle = null;
 
 var mySide = function() {
   var id = Meteor.userId();
@@ -69,7 +71,6 @@ var updateStatus = function() {
       status += ', ' + moveColor + ' is in check';
     }
   }
-  console.log(status);
   statusEl.html(status);
 
 };
@@ -117,19 +118,25 @@ var onMoveEnd = function() {
 };
 
 var mePlayed = function(move) {
-  console.log('move', move);
   return mySide() === move.color;
 };
 
+Template.game.onDestroyed(function() {
+  if(onChangeHandle) onChangeHandle.stop();
+  rendered = false;
+});
+
 Template.game.rendered = function() {
 
-  console.log(this.data);
+  console.log('game', this.data);
   chess = new Chess();
   game_id = this.data._id;
   game = this.data;
   statusEl = $('#status');
   boardEl = $('#board');
 
+  if(Session.get('notif-' + game_id))
+    this.$('.getNotif').prop('checked', true);
   var orientation = 'white';
   if(Meteor.userId() && this.data.black._id === Meteor.userId()) orientation = 'black';
 
@@ -148,33 +155,31 @@ Template.game.rendered = function() {
   board = new ChessBoard('board', cfg);
   updateStatus();
 
-  Deps.autorun(function() {
-    (function() {
-      var initializing = true;
-      Moves.find({game_id: game_id}).observeChanges({
-        added: function(id, doc) {
-          //console.log('new move', doc);
-          // Highlight
-          boardEl.find('.' + squareClass).removeClass('highlight-move');
-          boardEl.find('.square-' + doc.move.from).addClass('highlight-move');
-          squareToHighlight = doc.move.to;
-          // move
-          chess.move(doc.move);
-          board.position(chess.fen());
-          updateStatus();
-          if(!initializing && Session.get('notif-' + game._id) === true && !mePlayed(doc.move)) {
-            var n = new Notification(game.white.name + " - " + game.black.name, {
-              body: doc.move.san,
-              icon: "http://learningchess.meteor.com/img/chesspieces/wikipedia/wN.png"
-            });
-            n.onclick = function(e) { window.focus(); this.cancel(); };
-            n.show();
-          }
-        }
-      });
-      initializing = false;
-    })();
+  onChangeHandle = Moves.find({game_id: game_id}).observeChanges({
+    added: function(id, doc) {
+      //console.log('new move', doc);
+      // move
+      chess.move(doc.move);
+      board.position(chess.fen());
+      updateStatus();
+      // Highlight
+      boardEl.find('.' + squareClass).removeClass('highlight-move');
+      boardEl.find('.square-' + doc.move.from).addClass('highlight-move');
+      squareToHighlight = doc.move.to;
+      if(rendered && Session.get('notif-' + game_id) && !mePlayed(doc.move)) {
+        new Notification(game.white.name + " - " + game.black.name, {
+          body: doc.move.san,
+          icon: "http://learningchess.meteor.com/img/chesspieces/wikipedia/wN.png",
+          tag: game_id
+        }).onclick = function(e) {
+          window.focus();
+        };
+      }
+
+    }
   });
+
+  rendered = true;
 
 };
 
@@ -207,12 +212,8 @@ Template.game.helpers({
 
 Template.game.events({
 
-  'drop': function(e, tpl) {
-    console.log('drop', e, tpl);
-  },
   'submit': function(e, tpl) {
     e.preventDefault();
-    console.log(tpl.$('#chatMsg').val());
     Meteor.call('chatInsert', this._id, tpl.$('#chatMsg').val());
     tpl.$('#chatMsg').val('');
   },
