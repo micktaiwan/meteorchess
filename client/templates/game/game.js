@@ -3,6 +3,14 @@ var squareToHighlight, squareClass = 'square-55d63';
 var rendered = false;
 var onChangeHandle = null;
 
+var scrollChat = function() {
+  var el = $('.chats');
+  el.animate({
+    scrollTop: el[0].scrollHeight
+  }, 100);
+};
+
+
 var mySide = function() {
   var id = Meteor.userId();
   if(game.white._id === id) return 'w';
@@ -198,7 +206,7 @@ Template.game.rendered = function() {
   });
 
   rendered = true;
-
+  scrollChat();
 };
 
 Template.game.helpers({
@@ -235,8 +243,11 @@ Template.game.events({
 
   'submit': function(e, tpl) {
     e.preventDefault();
-    Meteor.call('chatInsert', this._id, tpl.$('#chatMsg').val());
+    Meteor.call('chatInsert', this._id, tpl.$('#chatMsg').val(), function() {
+      scrollChat();
+    });
     tpl.$('#chatMsg').val('');
+
   },
 
   'click .getNotif': function(e, tpl) {

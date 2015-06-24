@@ -15,5 +15,5 @@ Meteor.publish('game-moves', function(id) {
 });
 
 Meteor.publish('chats', function(id) {
-  return Chats.find({gameId: id}, {limit: 100});
+  return Chats.find({gameId: id}, {limit: 100, sort: {createdAt: -1}});
 });
