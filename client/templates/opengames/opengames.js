@@ -36,8 +36,9 @@ Template.playingGame.helpers({
   },
 
   'meToPlayClass': function() {
+    if(this.status === 'ended') return '';
     return ((this.white._id === Meteor.userId() && this.to_play === 'w') ||
-    (this.black._id === Meteor.userId() && this.to_play === 'b'))? 'meToPlay' : '';
+    (this.black._id === Meteor.userId() && this.to_play === 'b')) ? 'meToPlay' : '';
   }
 
 });
