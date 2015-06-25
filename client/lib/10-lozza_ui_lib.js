@@ -1,17 +1,11 @@
-if(typeof console == "undefined") {
-  this.console = {
-    log: function() {
-    }
-  };
-}
-
-lozData = {};
-
-lozData.next = 0; // next board id.
-lozData.hashFull = 0;
-lozData.mvNum = 0;
-lozData.mvStr = '';
-lozData.source = 'lozza.js';
+lozData = {
+  next: 0, // next board id
+  hashFull: 0,
+  mvNum: 0,
+  mvStr: '',
+  source: '/lozza.js',
+  defaultThinkTime: 2
+};
 
 Number.prototype.round = function(places) {
 
@@ -136,7 +130,7 @@ lozUpdateInfo = function() {
   $(lozData.idInfo).prepend(lozData.info + '<br>');
 };
 
-lozUpdateBoard = function() {
+lozNewBoard = function() {
 
   var id = 'board' + lozData.next++;
 

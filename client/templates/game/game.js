@@ -18,6 +18,11 @@ var mySide = function() {
   return 'none';
 };
 
+var isComputerToPlay = function(to_play) {
+  var s = mySide();
+  return ((s === 'w' && game.black.type === 'computer') || (s === 'b' && game.white.type === 'computer')) && s != to_play;
+};
+
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
@@ -33,20 +38,7 @@ var onDragStart = function(source, piece, position, orientation) {
   }
 };
 
-var onDrop = function(source, target) {
-  if (target === 'offboard' || target == source)
-    return;
-
-  // see if the move is legal
-  var move = chess.move({
-    from: source,
-    to: target,
-    promotion: 'q' // NOTE: always promote to a queen for example simplicity
-  });
-
-  // illegal move
-  if(move === null) return 'snapback';
-  updateStatus();
+var onMove = function(userId, move) {
   var result = undefined;
   // checkmate?
   if(chess.in_checkmate() === true)
@@ -54,7 +46,33 @@ var onDrop = function(source, target) {
   else if(chess.in_draw() === true)
     result = 'draw';
 
-  Meteor.call('gameMove', game_id, move, chess.fen(), chess.pgn(), chess.game_over(), result);
+  Meteor.call('gameMove', game_id, userId, move, chess.fen(), chess.pgn(), chess.game_over(), result, function(err, rv) {
+    if(result) return; // game ended
+    if(isComputerToPlay(chess.turn())) {
+      lozPlay();
+    }
+  });
+};
+
+var onDrop = function(source, target, piece, newPos, oldPos, orientation) {
+  if(target === 'offboard' || target == source)
+    return;
+
+  if(!piece) piece = 'q'; // FIXME: should let the user choose
+  var userId = Meteor.userId();
+
+  // see if the move is legal
+  var move = chess.move({
+    from: source,
+    to: target,
+    promotion: piece
+  });
+  // illegal move
+  if(move === null) return 'snapback';
+
+  updateStatus();
+  onMove(userId, move);
+
 };
 
 // update the board position after the piece snap
@@ -166,8 +184,11 @@ Template.game.rendered = function() {
 
   if(Session.get('notif-' + game_id))
     this.$('.getNotif').prop('checked', true);
-  var orientation = 'white';
-  if(Meteor.userId() && this.data.black._id === Meteor.userId()) orientation = 'black';
+  var orientation;
+  if(mySide() === 'w')
+    orientation = 'white';
+  else
+    orientation = 'black';
 
   var cfg = {
     draggable: true,
@@ -195,6 +216,7 @@ Template.game.rendered = function() {
       boardEl.find('.' + squareClass).removeClass('highlight-move');
       boardEl.find('.square-' + doc.move.from).addClass('highlight-move');
       squareToHighlight = doc.move.to;
+      // desktop notification
       if(rendered && Session.get('notif-' + game_id) && !mePlayed(doc.move)) {
         new Notification(game.white.name + " - " + game.black.name, {
           body: doc.move.san,
@@ -210,6 +232,12 @@ Template.game.rendered = function() {
 
   rendered = true;
   scrollChat();
+  lozInit({chess: chess, board: board, autoplay: false, timePerMove: 0.5, onMove: onMove});
+
+  // if playing against computer, starts the game
+  if(isComputerToPlay(chess.turn())) {
+    lozPlay();
+  }
 };
 
 Template.game.helpers({
@@ -271,6 +299,5 @@ Template.game.events({
     }
   }
 
-})
-;
+});
 

@@ -2,45 +2,61 @@
  * Created by mfaivremacon on 22/06/15.
  */
 
-var mySide = function(game) {
-  var id = this.userId;
-  if(game.white._id === id) return 'w';
-  if(game.black._id === id) return 'b';
-  return null;
-};
-
-
 Meteor.methods({
 
-  'gameCreate': function(rated) {
+  'gameCreate': function(rated, color) {
     if(!this.userId) throw new Meteor.Error('user not logged');
     var name = getUserName(Meteor.users.findOne(this.userId));
-    return Games.insert({
+    var obj = {
       user: {_id: this.userId, name: name},
-      white: {_id: this.userId, name: name},
       status: 'open',
       rated: rated === "true",
       createdAt: new Date()
+    };
+    if(color === 'w') _.extend(obj, {white: {_id: this.userId, name: name, type: 'human'}});
+    else _.extend(obj, {black: {_id: this.userId, name: name, type: 'human'}});
+    return Games.insert(obj);
+  },
+
+  'gameCreateComputer': function(rated, color) {
+    if(!this.userId) throw new Meteor.Error('user not logged');
+    var name = getUserName(Meteor.users.findOne(this.userId));
+    var obj = {
+      user: {_id: this.userId, name: name},
+      status: 'playing',
+      rated: rated === "true",
+      createdAt: new Date(),
+      startedAt: new Date()
+    };
+    if(color === 'w') _.extend(obj, {
+      white: {_id: this.userId, name: name, type: 'human'},
+      black: {_id: 'lozza', name: 'Lozza (C)', type: 'computer'}
     });
+    else _.extend(obj, {
+      black: {_id: this.userId, name: name, type: 'human'},
+      white: {_id: 'lozza', name: 'Lozza (C)', type: 'computer'}
+    });
+    return Games.insert(obj);
   },
 
   'gameAccept': function(id) {
     console.log('accepting', id);
     if(!this.userId) throw new Meteor.Error('user not logged');
     var name = getUserName(Meteor.users.findOne(this.userId));
-    return Games.update({_id: id}, {
-      $set: {
-        status: 'playing',
-        black: {_id: this.userId, name: name},
-        startedAt: new Date()
-      }
-    });
+    var game = Games.findOne(id);
+    var obj = {
+      status: 'playing',
+      startedAt: new Date()
+    };
+    if(game.white) _.extend(obj, {black: {_id: this.userId, name: name}});
+    else _.extend(obj, {white: {_id: this.userId, name: name}});
+    return Games.update({_id: id}, {$set: obj});
   },
 
-  'gameMove': function(game_id, move, fen, pgn, game_over, status) {
+  'gameMove': function(game_id, userId, move, fen, pgn, game_over, status) {
     //console.log(game_id, move, fen);
     var ply = Moves.find({game_id: game_id}).count() + 1;
-    var to_play = move.color === 'w' ? 'b' : 'w';
+    var to_play = (move.color === 'w' ? 'b' : 'w');
     Moves.insert({
       game_id: game_id,
       move: move,
@@ -63,7 +79,7 @@ Meteor.methods({
       var winner = undefined, loser = undefined, win_color = undefined;
       if(status === 'checkmate') {
         var game = Games.findOne(game_id);
-        if(to_play === 'w' && p_id === game.white._id) {
+        if(to_play === 'w' && userId === game.white._id) {
           loser = game.white;
           winner = game.black;
           text = "Black won";
@@ -92,18 +108,20 @@ Meteor.methods({
     var p_id = this.userId;
     if(!p_id) throw new Meteor.Error('user not logged');
     var game = Games.findOne(id);
-    var winner, loser, win_color;
+    var winner, loser, win_color, text;
     if(p_id === game.white._id) {
       loser = game.white;
       winner = game.black;
       win_color = "b";
+      text = "White resigned";
     }
     else {
       loser = game.black;
       winner = game.white;
       win_color = "w";
+      text = "Black resigned";
     }
-    text = loser.name + " resigned";
+
     return Games.update({_id: id}, {
       $set: {
         status: 'ended',

@@ -1,14 +1,42 @@
 <template name="createGame">
 
-  <div class="createGameBox">
-    <div class="control-group">
-      <div class="controls">
-        <input name="rated" type="radio" value="true" checked/> Rated
-        <input name="rated" type="radio" value="false"/> Unrated
+  <div class="row">
+
+    <div class="col-xs-6">
+      <div class="createGameBox">
+        <div class="title">Against Human</div>
+        <div class="control-group">
+          <div class="controls">
+            <input name="ratedh" type="radio" value="true" checked/> Rated
+            <input name="ratedh" type="radio" value="false"/> Unrated
+          </div>
+          <div class="controls">
+            <input name="colorh" type="radio" value="w" checked/> White
+            <input name="colorh" type="radio" value="b"/> Black
+          </div>
+        </div>
+
+        <button id="createHumanGame" class="btn btn-primary">Create game</button>
       </div>
     </div>
 
-    <button id="createGame" class="btn btn-primary">Create a new game</button>
+    <div class="col-xs-6">
+      <div class="createGameBox">
+        <div class="title">Against Computer</div>
+        <div class="control-group">
+          <div class="controls">
+            <input name="rated" type="radio" value="true" checked/> Rated
+            <input name="rated" type="radio" value="false"/> Unrated
+          </div>
+          <div class="controls">
+            <input name="color" type="radio" value="w" checked/> White
+            <input name="color" type="radio" value="b"/> Black
+          </div>
+        </div>
+
+        <button id="createComputerGame" class="btn btn-primary">Create game</button>
+      </div>
+    </div>
   </div>
 
 </template>
