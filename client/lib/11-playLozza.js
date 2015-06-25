@@ -31,7 +31,6 @@ lozStandardRx = function(e) {
   if(lozData.tokens[0] == 'bestmove') {
     lozUpdateStats();
     lozData.bm = lozGetStr('bestmove', '');
-    console.log(lozData.bm);
     lozData.bmFr = lozData.bm[0] + lozData.bm[1];
     lozData.bmTo = lozData.bm[2] + lozData.bm[3];
     if(lozData.bm.length > 4)
@@ -233,16 +232,6 @@ lozInit = function(options) {
     window.location = lozMakeURL({
       t: getMoveTime()
     });
-    return false;
-  });
-
-  $('#playb').click(function() {
-
-    window.location = lozMakeURL({
-      t: getMoveTime(),
-      c: 'b'
-    });
-
     return false;
   });
 

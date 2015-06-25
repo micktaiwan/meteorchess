@@ -11,7 +11,8 @@ var scrollChat = function() {
 };
 
 
-var mySide = function() {
+var mySide = function(game) {
+  if(!game) return null; // as used in helpers, game could be undefined at some time
   var id = Meteor.userId();
   if(game.white._id === id) return 'w';
   if(game.black._id === id) return 'b';
@@ -19,7 +20,7 @@ var mySide = function() {
 };
 
 var isComputerToPlay = function(to_play) {
-  var s = mySide();
+  var s = mySide(game);
   return ((s === 'w' && game.black.type === 'computer') || (s === 'b' && game.white.type === 'computer')) && s != to_play;
 };
 
@@ -29,7 +30,7 @@ var onDragStart = function(source, piece, position, orientation) {
   if(game.status === 'ended') return false;
 
   var turn = chess.turn();
-  if(turn !== mySide()) return false;
+  if(turn !== mySide(game)) return false;
 
   if(chess.game_over() === true ||
     (turn === 'w' && piece.search(/^b/) !== -1) ||
@@ -165,7 +166,7 @@ var onMoveEnd = function() {
 };
 
 var mePlayed = function(move) {
-  return mySide() === move.color;
+  return mySide(game) === move.color;
 };
 
 Template.game.onDestroyed(function() {
@@ -185,7 +186,7 @@ Template.game.rendered = function() {
   if(Session.get('notif-' + game_id))
     this.$('.getNotif').prop('checked', true);
   var orientation;
-  if(mySide() === 'w')
+  if(mySide(game) !== 'b')
     orientation = 'white';
   else
     orientation = 'black';
@@ -247,12 +248,17 @@ Template.game.helpers({
   },
 
   topName: function() {
-    return this.white._id === Meteor.userId() ? this.black.name : this.white.name;
+    var s = mySide(this);
+    console.log('top', s);
+    return (s === 'w' || s === 'none') ? this.black.name : this.white.name;
   },
 
   bottomName: function() {
-    return this.white._id === Meteor.userId() ? this.white.name : this.black.name;
+    var s = mySide(this);
+    console.log('bottom', s);
+    return (s === 'w' || s === 'none') ? this.white.name : this.black.name;
   },
+
   moves: function() {
     return _.map(this.moves, function(m) {
       return m.san + " ";
