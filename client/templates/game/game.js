@@ -34,6 +34,9 @@ var onDragStart = function(source, piece, position, orientation) {
 };
 
 var onDrop = function(source, target) {
+  if (target === 'offboard' || target == source)
+    return;
+
   // see if the move is legal
   var move = chess.move({
     from: source,
