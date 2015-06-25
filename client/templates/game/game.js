@@ -272,6 +272,10 @@ Template.game.helpers({
   },
   hiddenIfEnded: function() {
     return this.status === 'ended' ? 'hidden' : '';
+  },
+  resignClass: function() {
+    if(this.status !== 'ended' && mySide(this) !== 'none') return '';
+    return 'hidden';
   }
 
 });
