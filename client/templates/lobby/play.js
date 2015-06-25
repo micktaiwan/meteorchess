@@ -13,6 +13,7 @@ lozData.page = 'play.htm';
 lozData.idInfo = '#info';
 lozData.idStats = '#stats';
 lozData.autoplay = true;
+lozData.showPV = false;
 
 play = function() {
   if(!chess.game_over()) {
@@ -28,14 +29,12 @@ play = function() {
 lozStandardRx = function(e) {
 
   //console.log(e.data);
-
   lozData.message = e.data;
   lozData.message = lozData.message.trim();
   lozData.message = lozData.message.replace(/\s+/g, ' ');
   lozData.tokens = lozData.message.split(' ');
 
   // bestmove
-
   if(lozData.tokens[0] == 'bestmove') {
     lozUpdateStats();
     lozData.bm = lozGetStr('bestmove', '');
@@ -50,9 +49,7 @@ lozStandardRx = function(e) {
     if(lozData.autoplay) play();
   }
 
-  //}}}
-  //{{{  option
-
+  // option
   else if(lozData.tokens[0] == 'option') {
     ;
   }
@@ -132,6 +129,8 @@ lozUpdateBestMove = function() {
 }
 
 function lozUpdatePV() {
+
+  if(!lozData.showPV) return;
 
   if(lozData.units == 'cp')
     $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (' + lozData.score + ') ' + lozData.pv + '<br>');
@@ -268,6 +267,7 @@ playLozza = function() {
   engine.postMessage('ucinewgame')
   engine.postMessage('debug off')
 
+  // TODO
   if(args.c == 'b') {
     board.orientation('black');
     engine.postMessage('position startpos');

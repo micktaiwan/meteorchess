@@ -13,15 +13,10 @@ lozData.mvNum = 0;
 lozData.mvStr = '';
 lozData.source = 'lozza.js';
 
-//{{{  Number.round
-
 Number.prototype.round = function(places) {
 
   return +(Math.round(this + "e+" + places) + "e-" + places);
 }
-
-//}}}
-//{{{  lozGetURLArgs
 
 lozGetURLArgs = function() {
 
@@ -35,9 +30,6 @@ lozGetURLArgs = function() {
 
   return result;
 };
-
-//}}}
-//{{{  lozDecodeFEN
 
 lozDecodeFEN = function(fen) {
 
@@ -53,17 +45,11 @@ lozDecodeFEN = function(fen) {
   feno.ep = (a[3] == undefined) ? '-' : a[3];
 
   return feno;
-}
-
-//}}}
-//{{{  lozEncodeFEN
+};
 
 lozEncodeFEN = function(feno) {
   return feno.board + ' ' + feno.turn + ' ' + feno.rights + ' ' + feno.ep + ' 0 1';
-}
-
-//}}}
-//{{{  lozMakeURL
+};
 
 lozMakeURL = function(u) {
 
@@ -78,11 +64,7 @@ lozMakeURL = function(u) {
   }
 
   return url;
-}
-
-//}}}
-
-//{{{  lozGetInt
+};
 
 lozGetInt = function(key, def) {
 
@@ -91,10 +73,7 @@ lozGetInt = function(key, def) {
       return parseInt(lozData.tokens[i + 1]);
 
   return def;
-}
-
-//}}}
-//{{{  lozGetInt1
+};
 
 lozGetInt1 = function(key, def) {
 
@@ -103,10 +82,7 @@ lozGetInt1 = function(key, def) {
       return parseInt(lozData.tokens[i + 2]);
 
   return def;
-}
-
-//}}}
-//{{{  lozGetStr
+};
 
 lozGetStr = function(key, def) {
 
@@ -115,10 +91,7 @@ lozGetStr = function(key, def) {
       return lozData.tokens[i + 1];
 
   return def;
-}
-
-//}}}
-//{{{  lozGetStrToEnd
+};
 
 lozGetStrToEnd = function(key, def) {
 
@@ -132,7 +105,7 @@ lozGetStrToEnd = function(key, def) {
   }
 
   return def;
-}
+};
 
 lozUpdateStats = function() {
 
@@ -147,10 +120,7 @@ lozUpdateStats = function() {
     var hash = '';
 
   $(lozData.idStats).html(lozData.seconds + ' s | ' + lozData.kilonodes + ' kn | ' + lozData.knps + ' kn/s' + move + hash);
-}
-
-//}}}
-//{{{  lozUpdatePV
+};
 
 lozUpdatePV = function() {
 
@@ -160,18 +130,11 @@ lozUpdatePV = function() {
     var d = lozData.depth;
 
   $(lozData.idInfo).prepend(lozData.seconds + ' ' + d + ' (' + lozData.score + lozData.units + ') ' + lozData.pv + '<br>');
-}
-
-//}}}
-//{{{  lozUpdateInfo
+};
 
 lozUpdateInfo = function() {
-
   $(lozData.idInfo).prepend(lozData.info + '<br>');
-}
-
-//}}}
-//{{{  lozUpdateBoard
+};
 
 lozUpdateBoard = function() {
 
@@ -186,7 +149,4 @@ lozUpdateBoard = function() {
     position: lozData.board
   });
 
-}
-
-//}}}
-
+};
