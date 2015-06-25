@@ -12,8 +12,107 @@ var engine = null;
 lozData.page = 'play.htm';
 lozData.idInfo = '#info';
 lozData.idStats = '#stats';
+lozData.autoplay = true;
 
-//{{{  lozUpdateBestMove
+play = function() {
+  if(!chess.game_over()) {
+    $(lozData.idInfo).html('');
+    var movetime = getMoveTime();
+    engine.postMessage('position startpos moves ' + strMoves());
+    engine.postMessage('go movetime ' + movetime);
+  }
+  else
+    showEnd();
+}
+
+lozStandardRx = function(e) {
+
+  //console.log(e.data);
+
+  lozData.message = e.data;
+  lozData.message = lozData.message.trim();
+  lozData.message = lozData.message.replace(/\s+/g, ' ');
+  lozData.tokens = lozData.message.split(' ');
+
+  // bestmove
+
+  if(lozData.tokens[0] == 'bestmove') {
+    lozUpdateStats();
+    lozData.bm = lozGetStr('bestmove', '');
+    lozData.bmFr = lozData.bm[0] + lozData.bm[1];
+    lozData.bmTo = lozData.bm[2] + lozData.bm[3];
+    if(lozData.length > 4)
+      lozData.bmPr = lozData.bm[4];
+    else
+      lozData.bmPr = '';
+
+    lozUpdateBestMove();
+    if(lozData.autoplay) play();
+  }
+
+  //}}}
+  //{{{  option
+
+  else if(lozData.tokens[0] == 'option') {
+    ;
+  }
+
+  // info string debug
+  else if(lozData.tokens[0] == 'info' && lozData.tokens[1] == 'string' && lozData.tokens[2] == 'debug') {
+    lozData.info = '<b>' + lozData.message.replace(/info string debug /, '') + '</b>';
+    lozUpdateInfo();
+  }
+
+  // info string
+  else if(lozData.tokens[0] == 'info' && lozData.tokens[1] == 'string') {
+    lozData.info = lozData.message.replace(/info string /, '');
+    lozUpdateInfo();
+  }
+
+  //  info
+  else if(lozData.tokens[0] == 'info') {
+
+    var pv = lozData.pv;
+    var score = lozData.score;
+    var units = lozData.units;
+    var depth = lozData.depth;
+
+    lozData.mvStr = lozGetStr('currmove', lozData.mvStr);
+    lozData.mvNum = lozGetInt('currmovenumber', lozData.mvNum);
+    lozData.depth = lozGetInt('depth', lozData.depth);
+    lozData.selDepth = lozGetInt('seldepth', lozData.seldepth);
+    lozData.units = lozGetStr('score', lozData.units);
+    lozData.score = lozGetInt1('score', lozData.score);
+    lozData.pv = lozGetStrToEnd('pv', lozData.pv);
+    lozData.nodes = lozGetInt('nodes', lozData.nodes);
+    lozData.time = lozGetInt('time', lozData.time);
+    lozData.nps = lozGetInt('nps', lozData.nps);
+    lozData.hashFull = lozGetInt('hashfull', lozData.hashFull);
+
+    lozData.seconds = (lozData.time / 1000).round(2);
+    lozData.meganodes = (lozData.nodes / 1000000).round(2);
+    lozData.mnps = (lozData.nps / 1000000).round(2);
+    lozData.kilonodes = (lozData.nodes / 1000).round(2);
+    lozData.knps = (lozData.nps / 1000).round(2);
+
+    lozUpdateStats();
+
+    if(pv != lozData.pv || score != lozData.score || units != lozData.units || depth != lozData.depth)
+      lozUpdatePV();
+  }
+
+  else if(lozData.tokens[0] == 'board') {
+    lozData.board = lozGetStr('board', '');
+    lozUpdateBoard();
+  }
+
+  //  everything else
+  else {
+    lozData.info = lozData.message;
+    lozUpdateInfo();
+  }
+
+};
 
 lozUpdateBestMove = function() {
 
@@ -32,9 +131,6 @@ lozUpdateBestMove = function() {
     showEnd();
 }
 
-//}}}
-//{{{  lozUpdatePV
-
 function lozUpdatePV() {
 
   if(lozData.units == 'cp')
@@ -45,9 +141,6 @@ function lozUpdatePV() {
     $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (<b>checkmate</b>) ' + lozData.pv + '<br>');
 
 }
-
-//}}}
-//{{{  onDrop
 
 var onDrop = function(source, target, piece, newPos, oldPos, orientation) {
 
@@ -67,16 +160,13 @@ var onDrop = function(source, target, piece, newPos, oldPos, orientation) {
 
   if(!chess.game_over()) {
     $(lozData.idInfo).html('');
-    var movetime = getMoveTime() * 1000;
+    var movetime = getMoveTime();
     engine.postMessage('position startpos moves ' + strMoves());
     engine.postMessage('go movetime ' + movetime);
   }
   else
     showEnd();
 };
-
-//}}}
-//{{{  onDragStart
 
 var onDragStart = function(source, piece, position, orientation) {
 
@@ -86,9 +176,6 @@ var onDragStart = function(source, piece, position, orientation) {
 
   return true;
 };
-
-//}}}
-//{{{  strMoves
 
 function strMoves() {
 
@@ -107,9 +194,6 @@ function strMoves() {
   return movesStr;
 }
 
-//}}}
-//{{{  showEnd
-
 function showEnd() {
 
   if(chess.in_checkmate())
@@ -126,9 +210,6 @@ function showEnd() {
     $(lozData.idInfo).html('Game over but not sure why!');
 }
 
-//}}}
-//{{{  getMoveTime
-
 function getMoveTime() {
 
   var t = parseInt($('#permove').val());
@@ -136,31 +217,23 @@ function getMoveTime() {
     t = 1;
     $('#permove').val(1);
   }
-  return t;
+  return t * 1000;
 }
-
-//}}}
 
 playLozza = function() {
 
-  //{{{  init DOM
-
+  //  init DOM
   if(args.t) {
     $('#permove').val(args.t);
     getMoveTime();
   }
-
   $('input').tooltip({delay: {"show": 1000, "hide": 100}});
 
-  //}}}
-  //{{{  handlers
-
+  //  handlers
   $('#playw').click(function() {
-
     window.location = lozMakeURL({
       t: getMoveTime()
     });
-
     return false;
   });
 
@@ -184,10 +257,10 @@ playLozza = function() {
 
   board = new ChessBoard('board', {
     showNotation: false,
-    draggable: true,
-    dropOffBoard: 'snapback',
-    onDrop: onDrop,
-    onDragStart: onDragStart,
+    //draggable: true,
+    //dropOffBoard: 'snapback',
+    //onDrop: onDrop,
+    //onDragStart: onDragStart,
     position: 'start'
   });
 
@@ -198,12 +271,14 @@ playLozza = function() {
   if(args.c == 'b') {
     board.orientation('black');
     engine.postMessage('position startpos');
-    engine.postMessage('go movetime ' + getMoveTime() * 1000);
+    engine.postMessage('go movetime ' + getMoveTime());
   }
 
   else {
     board.orientation('white');
   }
+
+  if(lozData.autoplay) play();
 
 };
 
