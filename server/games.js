@@ -6,9 +6,11 @@ Meteor.methods({
 
   'gameCreate': function(rated, color) {
     if(!this.userId) throw new Meteor.Error('user not logged');
-    var name = getUserName(Meteor.users.findOne(this.userId));
+    var u = Meteor.users.findOne(this.userId);
+    var name = getUserName(u);
+    var type =  (u.profile && u.profile.guest) ? 'guest' : 'member';
     var obj = {
-      user: {_id: this.userId, name: name},
+      user: {_id: this.userId, name: name, type: type},
       status: 'open',
       rated: rated === "true",
       createdAt: new Date()
@@ -48,15 +50,15 @@ Meteor.methods({
       status: 'playing',
       startedAt: new Date()
     };
-    if(game.white) _.extend(obj, {black: {_id: this.userId, name: name}});
-    else _.extend(obj, {white: {_id: this.userId, name: name}});
+    if(game.white) _.extend(obj, {black: {_id: this.userId, name: name, type: 'human'}});
+    else _.extend(obj, {white: {_id: this.userId, name: name, type: 'human'}});
     return Games.update({_id: id}, {$set: obj});
   },
 
   'gameMove': function(game_id, move, fen, pgn, game_over, status) {
     var ply = Moves.find({game_id: game_id}).count() + 1;
     var to_play = (move.color === 'w' ? 'b' : 'w');
-    console.log(game_id, move, fen, to_play);
+    //console.log(game_id, move, fen, to_play);
     Moves.insert({
       game_id: game_id,
       move: move,

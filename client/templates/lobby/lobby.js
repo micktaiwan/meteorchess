@@ -17,6 +17,8 @@ Template.lobby.rendered = function() {
 
   lozInit({chess: chess, board: board, autoplay: true, timePerMove: 2, noDB: true});
 
+  Meteor.call('guestsClean');
+
 };
 
 Template.lobby.helpers({
@@ -27,6 +29,13 @@ Template.lobby.helpers({
         "status.lastLogin.date": -1
       }
     });
+  },
+
+  guestname: function() {
+    var u = Meteor.user();
+    if(u.profile && u.profile.guest)
+      return 'Guest name:<br/><b>' + Meteor.user().username + '</b><br/>Sign in to keep your games';
+    return '<b>Online users</b>';
   }
 
 });
@@ -56,6 +65,11 @@ Template.onlineUser.helpers({
 
   name: function() {
     return getUserName(this);
+  },
+
+  guestSign: function() {
+    if(this.profile && this.profile.guest) return '(guest)';
+    return '';
   }
 
 });
