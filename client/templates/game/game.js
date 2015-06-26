@@ -42,6 +42,10 @@ var onDragStart = function(source, piece, position, orientation) {
 };
 
 var onMove = function(move) {
+  if(!move.color) {
+    sAlert.error('Not a move!', {timeout: 'none'});
+    return;
+  }
   var result = undefined;
   // checkmate?
   if(chess.in_checkmate() === true)
@@ -250,6 +254,10 @@ Template.game.helpers({
 
   topName: function() {
     var s = mySide(this);
+    if(board) { // it's here just to be somewhere, and be reactive depending on user login and mySide changes
+      board.orientation(s !== 'b' ? 'white' : 'black');
+      console.log('oriented');
+    }
     return (s === 'w' || s === 'none') ? this.black.name : this.white.name;
   },
 

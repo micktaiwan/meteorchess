@@ -8,4 +8,14 @@ Meteor.startup(function() {
     passwordSignupFields: "USERNAME_AND_EMAIL"
   });
 
+  sAlert.config({
+    effect: 'bouncyflip',
+    position: 'top-left',
+    timeout: 5000,
+    html: false,
+    onRouteClose: true,
+    stack: true,
+    offset: 0
+  });
+
 });
