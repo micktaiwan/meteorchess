@@ -13,7 +13,7 @@ Template.openGames.helpers({
   },
 
   'endedGames': function() {
-    return Games.find({status: 'ended'}, {sort: {createdAt: 1}});
+    return Games.find({status: 'ended'}, {sort: {lastMovedAt: -1}});
   }
 });
 
