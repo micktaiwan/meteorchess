@@ -39,7 +39,7 @@ var onDragStart = function(source, piece, position, orientation) {
   }
 };
 
-var onMove = function(userId, move) {
+var onMove = function(move) {
   var result = undefined;
   // checkmate?
   if(chess.in_checkmate() === true)
@@ -47,7 +47,7 @@ var onMove = function(userId, move) {
   else if(chess.in_draw() === true)
     result = 'draw';
 
-  Meteor.call('gameMove', game_id, userId, move, chess.fen(), chess.pgn(), chess.game_over(), result, function(err, rv) {
+  Meteor.call('gameMove', game_id, move, chess.fen(), chess.pgn(), chess.game_over(), result, function(err, rv) {
     if(result) return; // game ended
     if(isComputerToPlay(chess.turn())) {
       lozPlay();
@@ -60,7 +60,6 @@ var onDrop = function(source, target, piece, newPos, oldPos, orientation) {
     return;
 
   if(!piece) piece = 'q'; // FIXME: should let the user choose
-  var userId = Meteor.userId();
 
   // see if the move is legal
   var move = chess.move({
@@ -72,7 +71,7 @@ var onDrop = function(source, target, piece, newPos, oldPos, orientation) {
   if(move === null) return 'snapback';
 
   updateStatus();
-  onMove(userId, move);
+  onMove(move);
 
 };
 
@@ -233,7 +232,7 @@ Template.game.rendered = function() {
 
   rendered = true;
   scrollChat();
-  lozInit({chess: chess, board: board, autoplay: false, timePerMove: 0.5, onMove: onMove});
+  lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove});
 
   // if playing against computer, starts the game
   if(isComputerToPlay(chess.turn())) {

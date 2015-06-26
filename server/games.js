@@ -53,10 +53,10 @@ Meteor.methods({
     return Games.update({_id: id}, {$set: obj});
   },
 
-  'gameMove': function(game_id, userId, move, fen, pgn, game_over, status) {
-    //console.log(game_id, move, fen);
+  'gameMove': function(game_id, move, fen, pgn, game_over, status) {
     var ply = Moves.find({game_id: game_id}).count() + 1;
     var to_play = (move.color === 'w' ? 'b' : 'w');
+    console.log(game_id, move, fen, to_play);
     Moves.insert({
       game_id: game_id,
       move: move,
@@ -79,7 +79,7 @@ Meteor.methods({
       var winner = undefined, loser = undefined, win_color = undefined;
       if(status === 'checkmate') {
         var game = Games.findOne(game_id);
-        if(to_play === 'w' && userId === game.white._id) {
+        if(to_play === 'w') {
           loser = game.white;
           winner = game.black;
           text = "Black won";
