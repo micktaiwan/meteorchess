@@ -121,7 +121,7 @@ lozUpdateBestMove = function() {
     showEnd();
 
   if(!lozData.noDB) {
-    lozData.onMove('lozza', move); // FIXME: the userId is hard coded
+    lozData.onMove(move);
   }
 };
 

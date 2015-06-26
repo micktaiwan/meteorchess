@@ -20,7 +20,9 @@ var mySide = function(game) {
 };
 
 var isComputerToPlay = function(to_play) {
+  if(game.status === 'ended') return false;
   var s = mySide(game);
+  console.log('side', s, to_play);
   return ((s === 'w' && game.black.type === 'computer') || (s === 'b' && game.white.type === 'computer')) && s != to_play;
 };
 
@@ -248,13 +250,11 @@ Template.game.helpers({
 
   topName: function() {
     var s = mySide(this);
-    console.log('top', s);
     return (s === 'w' || s === 'none') ? this.black.name : this.white.name;
   },
 
   bottomName: function() {
     var s = mySide(this);
-    console.log('bottom', s);
     return (s === 'w' || s === 'none') ? this.white.name : this.black.name;
   },
 
