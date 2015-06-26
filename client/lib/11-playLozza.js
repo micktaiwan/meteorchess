@@ -3,22 +3,6 @@ var chess = null;
 var drag = true;
 var engine = null;
 
-lozData.page = 'play.htm';
-lozData.idInfo = '#info';
-lozData.idStats = '#stats';
-lozData.autoplay = false;
-lozData.showPV = false;
-
-lozPlay = function() {
-  if(!chess.game_over()) {
-    $(lozData.idInfo).html('');
-    var movetime = getMoveTime();
-    engine.postMessage('position startpos moves ' + strMoves());
-    engine.postMessage('go movetime ' + movetime);
-  }
-  else showEnd();
-};
-
 lozStandardRx = function(e) {
 
   //console.log('Rx', e.data);
@@ -224,8 +208,18 @@ function getMoveTime() {
   return t * 1000;
 }
 
+lozPlay = function() {
+  if(!chess.game_over()) {
+    $(lozData.idInfo).html('');
+    var movetime = getMoveTime();
+    engine.postMessage('position startpos moves ' + strMoves());
+    engine.postMessage('go movetime ' + movetime);
+  }
+  else showEnd();
+};
+
 lozInit = function(options) {
-  console.log('playLozza');
+  console.log('lozInit');
   chess = options.chess;
   board = options.board;
   lozData.autoplay = options.autoplay;
@@ -233,18 +227,8 @@ lozInit = function(options) {
   lozData.defaultThinkTime = options.timePerMove || 1;
   lozData.noDB = options.noDB;
   lozData.onMove = options.onMove;
-
-  $('input').tooltip({delay: {"show": 1000, "hide": 100}});
-
-  //  handlers
-  $('#playw').click(function() {
-    window.location = lozMakeURL({
-      t: getMoveTime()
-    });
-    return false;
-  });
-
   console.log('engine', lozData.source);
+  //$('input').tooltip({delay: {"show": 1000, "hide": 100}});
   // when entering a game, it is possible that we are already searching a move
   // so to avoid receiving a bestmove when not expected, we cancel the current worker
   if(engine) engine.terminate();
@@ -255,6 +239,4 @@ lozInit = function(options) {
   engine.postMessage('debug off');
   //engine.postMessage('position startpos');
   if(lozData.autoplay) lozPlay();
-
 };
-

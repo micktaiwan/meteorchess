@@ -4,7 +4,12 @@ lozData = {
   mvNum: 0,
   mvStr: '',
   source: '/lozza.js',
-  defaultThinkTime: 2
+  defaultThinkTime: 2,
+  page: 'play.htm',
+  idInfo: '#info',
+  idStats: '#stats',
+  autoplay: false,
+  showPV: false
 };
 
 Number.prototype.round = function(places) {
@@ -43,21 +48,6 @@ lozDecodeFEN = function(fen) {
 
 lozEncodeFEN = function(feno) {
   return feno.board + ' ' + feno.turn + ' ' + feno.rights + ' ' + feno.ep + ' 0 1';
-};
-
-lozMakeURL = function(u) {
-
-  var url = lozData.page;
-  var sep = '?';
-
-  for(var a in u) {
-    if(typeof u[a] == 'undefined')
-      continue;
-    url += sep + a + '=' + u[a];
-    sep = '&';
-  }
-
-  return url;
 };
 
 lozGetInt = function(key, def) {

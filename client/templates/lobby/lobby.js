@@ -52,6 +52,10 @@ Template.onlineUser.helpers({
     if(this.status.idle) return "idle";
     if(this.status.online) return "online";
     return "offline";
+  },
+
+  name: function() {
+    return getUserName(this);
   }
 
 });

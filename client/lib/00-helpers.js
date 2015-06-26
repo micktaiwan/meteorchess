@@ -1,6 +1,23 @@
 /**
  * Created by mfaivremacon on 22/06/15.
  */
+// user online status monitoring
+Tracker.autorun(function() {
+  try {
+    if(Meteor.userId()) {
+      UserStatus.startMonitor({
+        threshold: 30000,
+        interval: 1000,
+        idleOnBlur: true
+      });
+    }
+    else {
+      UserStatus.stopMonitor();
+    }
+  } catch(err) {
+    // console.log(err); // Seems that if(UserStatus.isMonitoring) does not work so catching every error
+  }
+});
 
 Meteor.startup(function() {
 
