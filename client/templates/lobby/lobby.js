@@ -19,7 +19,17 @@ Template.lobby.rendered = function() {
 
 };
 
-Template.lobby.helpers({});
+Template.lobby.helpers({
+  usersOnline: function() {
+    return Meteor.users.find({"status.online": true}, {
+      sort: {
+        "status.online": -1,
+        "status.lastLogin.date": -1
+      }
+    });
+  }
+
+});
 
 Template.lobby.events({
 
@@ -31,6 +41,17 @@ Template.lobby.events({
     Meteor.call('gameCreateComputer', tpl.$('[name=rated]:checked').val(), tpl.$('[name=color]:checked').val(), function(err, id) {
       if(!err) Router.go('game', {id: id});
     });
+  }
+
+});
+
+Template.onlineUser.helpers({
+
+  onlineClass: function() {
+    if(!this.status) return "offline";
+    if(this.status.idle) return "idle";
+    if(this.status.online) return "online";
+    return "offline";
   }
 
 });

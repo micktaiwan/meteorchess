@@ -19,11 +19,14 @@ var mySide = function(game) {
   return 'none';
 };
 
+var opponentIsComputer = function() {
+  var s = mySide(game);
+  return (s === 'w' && game.black.type === 'computer') || (s === 'b' && game.white.type === 'computer');
+};
+
 var isComputerToPlay = function(to_play) {
   if(game.status === 'ended') return false;
-  var s = mySide(game);
-  console.log('side', s, to_play);
-  return ((s === 'w' && game.black.type === 'computer') || (s === 'b' && game.white.type === 'computer')) && s != to_play;
+  return opponentIsComputer() && mySide(game) != to_play;
 };
 
 // do not pick up pieces if the game is over
@@ -42,10 +45,7 @@ var onDragStart = function(source, piece, position, orientation) {
 };
 
 var onMove = function(move) {
-  if(!move.color) {
-    sAlert.error('Not a move!', {timeout: 'none'});
-    return;
-  }
+  console.log('onMove', move);
   var result = undefined;
   // checkmate?
   if(chess.in_checkmate() === true)
@@ -171,6 +171,11 @@ var onMoveEnd = function() {
 };
 
 var mePlayed = function(move) {
+  if(!move.color) {
+    sAlert.error('Not a move');
+    console.error('Not a move', move);
+    return true; // no notification
+  }
   return mySide(game) === move.color;
 };
 
@@ -232,7 +237,6 @@ Template.game.rendered = function() {
           window.focus();
         };
       }
-
     }
   });
 
@@ -241,7 +245,8 @@ Template.game.rendered = function() {
   lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove});
 
   // if playing against computer, starts the game
-  if(isComputerToPlay(chess.turn())) {
+  if(!game.ply && isComputerToPlay(chess.turn())) {
+    console.log('starting');
     lozPlay();
   }
 };

@@ -6,6 +6,11 @@ Meteor.publish('games', function() {
   return Games.find({}); // FIXME
 });
 
+Meteor.publish('users', function() {
+  return Meteor.users.find();
+});
+
+
 Meteor.publish('game', function(id) {
   return Games.find({_id: id});
 });

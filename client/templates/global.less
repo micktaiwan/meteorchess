@@ -66,6 +66,51 @@ h2 {
     font-weight: bold;
   }
 }
+
 #info {
 
+}
+
+.online-users {
+  .online-user {
+    width: 100%;
+    float: right;
+    margin-bottom: 3px;
+    border-radius: 0.25em;
+    padding: 3px;
+    font-size: 0.9em;
+    text-align: left;
+    cursor: default;
+    -webkit-transition: background 1s ease-in;
+    -moz-transition: background 1s ease-in;
+    -o-transition: background 1s ease-in;
+    transition: background 1s ease-in;
+    &.online {
+      color: #585;
+      background: #afa;
+      &:before {
+        content: "\f00c";
+        font-family: FontAwesome;
+        padding-right: 0.5em;
+      }
+    }
+    &.idle {
+      color: #7a7;
+      background: #cfc;
+      &:before {
+        content: "\f08b";
+        font-family: FontAwesome;
+        padding-right: 0.5em;
+      }
+    }
+    &.offline {
+      color: #aaa;
+      margin: 0;
+      &:before {
+        content: "\f00d";
+        font-family: FontAwesome;
+        padding-right: 0.5em;
+      }
+    }
+  }
 }

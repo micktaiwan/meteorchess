@@ -21,7 +21,7 @@ lozPlay = function() {
 
 lozStandardRx = function(e) {
 
-  //console.log(e.data);
+  //console.log('Rx', e.data);
   lozData.message = e.data;
   lozData.message = lozData.message.trim();
   lozData.message = lozData.message.replace(/\s+/g, ' ');
@@ -114,6 +114,15 @@ lozUpdateBestMove = function() {
     to: lozData.bmTo,
     promotion: lozData.bmPr
   });
+  if(move === null) {
+    sAlert.error('No move!');
+    console.error('No move!', {
+      from: lozData.bmFr,
+      to: lozData.bmTo,
+      promotion: lozData.bmPr
+    });
+    return;
+  }
   board.position(chess.fen());
   $('#moves').html(chess.pgn({newline_char: '<br>'}));
 
@@ -236,7 +245,10 @@ lozInit = function(options) {
   });
 
   console.log('engine', lozData.source);
-  if(!engine) engine = new Worker(lozData.source);
+  // when entering a game, it is possible that we are already searching a move
+  // so to avoid receiving a bestmove when not expected, we cancel the current worker
+  if(engine) engine.terminate();
+  engine = new Worker(lozData.source);
   engine.onmessage = lozStandardRx;
   engine.postMessage('uci');
   engine.postMessage('ucinewgame');
