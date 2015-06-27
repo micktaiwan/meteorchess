@@ -50,6 +50,16 @@ Template.lobby.events({
     Meteor.call('gameCreateComputer', tpl.$('[name=rated]:checked').val(), tpl.$('[name=color]:checked').val(), function(err, id) {
       if(!err) Router.go('game', {id: id});
     });
+  },
+
+  'click .cancel': function(e) {
+    e.stopPropagation();
+    var id = this._id;
+    console.log('cancel', id);
+    Meteor.call('gameCancel', id, function(err, rv) {
+      console.log(err);
+      if(err) sAlert.error(err.error);
+    });
   }
 
 });

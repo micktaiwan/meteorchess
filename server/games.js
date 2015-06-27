@@ -59,6 +59,12 @@ Meteor.methods({
   'gameCancel': function(id) {
     console.log('cancelling', id);
     if(!this.userId) throw new Meteor.Error('user not logged');
+    var game = Games.findOne(id);
+    if(game.ply > 5)
+      throw new Meteor.Error('Can not cancel a game with more than 5 plies');
+    Moves.remove({game_id: id});
+    Positions.update({}, {$pull: {games: id}});
+    Chats.remove({gameId: id});
     return Games.remove({_id: id});
   },
 

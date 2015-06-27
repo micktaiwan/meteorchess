@@ -288,6 +288,12 @@ Template.game.helpers({
   resignClass: function() {
     if(this.status !== 'ended' && mySide(this) !== 'none') return '';
     return 'hidden';
+  },
+
+  'cancelHidden': function() {
+    if(this.status === 'ended') return 'hidden';
+    if(this.ply > 5) return 'hidden';
+    return (this.white._id !== Meteor.userId() && this.black._id !== Meteor.userId()) ? 'hidden' : '';
   }
 
 });

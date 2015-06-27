@@ -28,7 +28,7 @@
 
   <div class="game {{myGameClass}}">
     <button class="btn btn-primary btn-xs accept {{hideIfMyGame}}">Accept</button>
-    <button class="btn btn-default btn-xs cancel {{showIfMyGame}}"><i class="fa fa-close"></i> Cancel</button>
+    <button class="btn btn-default btn-xs cancel {{cancelHidden}}"><i class="fa fa-close"></i> Cancel</button>
     {{user.name}}
     <span class="date" data-livestamp="{{createdAt}}"></span>
   </div>
@@ -40,6 +40,7 @@
   <div class="game {{meToPlayClass}}">
     <button class="btn btn-default btn-xs open {{myGameClass}}">Open</button>
     {{white.name}} - {{black.name}}
+    <button class="btn btn-warning btn-xs cancel {{cancelHidden}}"><i class="fa fa-close"></i> Cancel</button>
     <span class="date" data-livestamp="{{lastMovedAt}}"></span>
   </div>
 
