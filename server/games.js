@@ -55,6 +55,14 @@ Meteor.methods({
     return Games.update({_id: id}, {$set: obj});
   },
 
+
+  'gameCancel': function(id) {
+    console.log('cancelling', id);
+    if(!this.userId) throw new Meteor.Error('user not logged');
+    return Games.remove({_id: id});
+  },
+
+
   'gameMove': function(game_id, move, fen, pgn, game_over, status) {
     var ply = Moves.find({game_id: game_id}).count() + 1;
     var to_play = (move.color === 'w' ? 'b' : 'w');

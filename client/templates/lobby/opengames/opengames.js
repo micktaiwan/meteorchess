@@ -23,6 +23,11 @@ Template.openGame.helpers({
     return this.user._id === Meteor.userId() ? 'hidden' : '';
   },
 
+  'showIfMyGame': function() {
+    return this.user._id !== Meteor.userId() ? 'hidden' : '';
+  },
+
+
   'myGameClass': function() {
     return (this.user._id === Meteor.userId()) ? 'mygame' : '';
   }
@@ -55,8 +60,16 @@ Template.openGame.events({
       return;
     }
     Meteor.call('gameAccept', id, function(err, rv) {
-      console.log('rv', rv, id, err);
       if(!err) Router.go('game', {id: id});
+    });
+  },
+
+  'click .cancel': function(e) {
+    e.stopPropagation();
+    var id = this._id;
+    console.log('cancel', id);
+    Meteor.call('gameCancel', id, function(err, rv) {
+      if(err) sAlert.error(rv);
     });
   }
 
