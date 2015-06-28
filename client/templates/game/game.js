@@ -2,6 +2,8 @@ var board, boardEl, game, chess, game_id, statusEl, fenEl, pgnEl;
 var squareToHighlight, squareClass = 'square-55d63';
 var rendered = false;
 var onChangeHandle = null;
+var HISTORY_PLY = 'game-history-ply';
+var drag = true;
 
 var scrollChat = function() {
   var el = $('.chats');
@@ -9,7 +11,6 @@ var scrollChat = function() {
     scrollTop: el[0].scrollHeight
   }, 100);
 };
-
 
 var mySide = function(game) {
   if(!game) return null; // as used in helpers, game could be undefined at some time
@@ -32,6 +33,7 @@ var isComputerToPlay = function(to_play) {
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
+  if(!drag) return false;
   if(game.status === 'ended') return false;
 
   var turn = chess.turn();
@@ -142,7 +144,7 @@ var greySquare = function(square) {
 };
 
 var onMouseoverSquare = function(square, piece) {
-  if(game.status === 'ended') return;
+  if(!drag || game.status === 'ended') return;
 
   // get list of possible moves for this square
   var moves = chess.moves({
@@ -193,6 +195,10 @@ Template.game.rendered = function() {
   statusEl = $('#status');
   boardEl = $('#board');
 
+  // setting history cursor
+  if(!Session.get(HISTORY_PLY))
+    Session.set(HISTORY_PLY, game.ply);
+
   if(Session.get('notif-' + game_id))
     this.$('.getNotif').prop('checked', true);
   var orientation;
@@ -221,7 +227,12 @@ Template.game.rendered = function() {
       //console.log('new move', doc);
       // move
       chess.move(doc.move);
-      board.position(chess.fen());
+      //game = Games.findOne(game_id);
+      var ply = Session.get(HISTORY_PLY);
+      if(!rendered || ply === doc.ply-1) {
+        Session.set(HISTORY_PLY, doc.ply);
+        board.position(chess.fen());
+      }
       updateStatus();
       // Highlight
       boardEl.find('.' + squareClass).removeClass('highlight-move');
@@ -239,11 +250,10 @@ Template.game.rendered = function() {
       }
     }
   });
-
   rendered = true;
   scrollChat();
   lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove});
-
+  Session.set('game' + game._id + '-history', game.ply);
   // if playing against computer, starts the game
   if(!game.ply && isComputerToPlay(chess.turn())) {
     console.log('starting');
@@ -294,6 +304,21 @@ Template.game.helpers({
     if(this.status === 'ended') return 'hidden';
     if(this.ply > 5) return 'hidden';
     return (this.white._id !== Meteor.userId() && this.black._id !== Meteor.userId()) ? 'hidden' : '';
+  },
+
+  'nextButtonDisabled': function() {
+    var ply = Session.get(HISTORY_PLY);
+    return ply >= this.ply ? 'disabled' : '';
+  },
+
+  'prevButtonDisabled': function() {
+    var ply = Session.get(HISTORY_PLY);
+    return ply <= 0 ? 'disabled' : '';
+  },
+
+  'hideIfLastMove': function() {
+    var ply = Session.get(HISTORY_PLY);
+    return ply >= this.ply ? 'hidden' : '';
   }
 
 });
@@ -325,7 +350,44 @@ Template.game.events({
     if(confirm('Resign this game ?')) {
       Meteor.call('gameResign', this._id);
     }
+  },
+
+  'click .first': function(e, tpl) {
+    Session.set(HISTORY_PLY, 0);
+    board.position('start');
+  },
+
+  'click .last': function(e, tpl) {
+    Session.set(HISTORY_PLY, this.ply);
+    var fen = Moves.findOne({game_id: this._id, ply: this.ply}).fen;
+    board.position(fen);
+    drag = true;
+  },
+
+  'click .prev': function(e, tpl) {
+    var ply = Session.get(HISTORY_PLY);
+    if(ply === undefined) ply = this.ply;
+    ply--;
+    if(ply < 0) ply = 0;
+    drag = (ply === this.ply);
+    Session.set(HISTORY_PLY, ply);
+    if(ply === 0) board.position('start');
+    else {
+      var fen = Moves.findOne({game_id: this._id, ply: ply}).fen;
+      board.position(fen);
+    }
+  },
+
+  'click .next': function(e, tpl) {
+    var ply = Session.get(HISTORY_PLY);
+    if(ply === undefined) ply = this.ply;
+    ply++;
+    if(ply > this.ply) ply = this.ply;
+    drag = (ply === this.ply);
+    Session.set(HISTORY_PLY, ply);
+    var fen = Moves.findOne({game_id: this._id, ply: ply}).fen;
+    board.position(fen);
   }
 
-});
 
+});

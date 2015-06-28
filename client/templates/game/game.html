@@ -37,9 +37,18 @@
     <div class="col-xs-4">
       <div>FEN: {{fen}}</div>
       <div class="pgn">{{pgn}}</div>
+      <div class="btn-group move-controls" role="group">
+        <button class="btn btn-default btn-xs first" {{prevButtonDisabled}}>&lt;&lt;</button>
+        <button class="btn btn-default btn-xs prev" {{prevButtonDisabled}}>&lt;</button>
+        <button class="btn btn-default btn-xs next" {{nextButtonDisabled}}>&gt;</button>
+        <button class="btn btn-default btn-xs last" {{nextButtonDisabled}}>&gt;&gt;</button>
+      </div>
+      <div class="history-alert {{hideIfLastMove}}">Navigating in history</div>
 
-      <button class="btn btn-warning resign {{resignClass}}"><i class="fa fa-flag-o"></i> Resign</button>
-      <button class="btn btn-warning cancel {{cancelHidden}}"><i class="fa fa-close"></i> Cancel game</button>
+      <div class="btn-toolbar action-buttons" role="toolbar">
+        <button class="btn btn-warning resign {{resignClass}}"><i class="fa fa-flag-o"></i> Resign</button>
+        <button class="btn btn-warning cancel {{cancelHidden}}"><i class="fa fa-close"></i> Cancel game</button>
+      </div>
     </div>
   </div>
 
