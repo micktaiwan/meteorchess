@@ -57,7 +57,6 @@ Template.lobby.events({
     var id = this._id;
     console.log('cancel', id);
     Meteor.call('gameCancel', id, function(err, rv) {
-      console.log(err);
       if(err) sAlert.error(err.error);
     });
   }

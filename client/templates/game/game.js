@@ -346,7 +346,7 @@ Template.game.events({
     else Session.set('notif-' + this._id, false);
   },
 
-  'click .resign': function(e, tpl) {
+  'click .resign': function() {
     console.log('resiging');
     if(confirm('Resign this game ?')) {
       Meteor.call('gameResign', this._id);
@@ -384,7 +384,7 @@ Template.game.events({
     }
   },
 
-  'click .next': function(e, tpl) {
+  'click .next': function() {
     var ply = Session.get(HISTORY_PLY);
     if(ply === undefined) ply = this.ply;
     ply++;
@@ -393,6 +393,19 @@ Template.game.events({
     Session.set(HISTORY_PLY, ply);
     var fen = Moves.findOne({game_id: this._id, ply: ply}).fen;
     board.position(fen);
+  },
+
+  // FIXME: duplicated from lobby.js, put this in a helper
+  'click .cancel': function(e) {
+    e.stopPropagation();
+    var id = this._id;
+    console.log('cancel', id);
+    if(confirm('Cancel this game ?')) {
+      Meteor.call('gameCancel', id, function(err, rv) {
+        if(err) sAlert.error(err.error);
+        else Router.go('lobby');
+      });
+    }
   }
 
 });
