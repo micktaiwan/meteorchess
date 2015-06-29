@@ -63,6 +63,11 @@ var onMove = function(move) {
   });
 };
 
+var think = function(move) {
+  lozPlay();
+};
+
+
 var onDrop = function(source, target, piece, newPos, oldPos, orientation) {
   if(target === 'offboard' || target == source)
     return;
@@ -230,10 +235,11 @@ Template.game.rendered = function() {
       //game = Games.findOne(game_id);
       var ply = Session.get(HISTORY_PLY);
       if(!rendered || ply === doc.ply - 1) {
-        console.log('ply', ply, doc);
+        //console.log('ply', ply, doc);
         Session.set(HISTORY_PLY, doc.ply);
         board.position(chess.fen());
       }
+      if(rendered && !opponentIsComputer()) think();
       updateStatus();
       // Highlight
       boardEl.find('.' + squareClass).removeClass('highlight-move');
@@ -253,9 +259,14 @@ Template.game.rendered = function() {
   });
   rendered = true;
   scrollChat();
-  lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove, showPV: true});
+  if(opponentIsComputer())
+    lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove, showPV: true});
+  else
+    lozInit({chess: chess, board: board, autoplay: false, timePerMove: 10, onMove: think, showPV: true, noDB: true, thinkOnly: true});
+
   Session.set('game' + game._id + '-history', game.ply);
   Meteor.call('gameAddSpectator', game_id, Meteor.userId(), getUserName(Meteor.user()));
+
   // if playing against computer, starts the game
   if(game.ply === 0 && isComputerToPlay(chess.turn())) {
     console.log('starting');

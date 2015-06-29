@@ -35,8 +35,8 @@ lozStandardRx = function(e) {
 
   // info string debug
   else if(lozData.tokens[0] == 'info' && lozData.tokens[1] == 'string' && lozData.tokens[2] == 'debug') {
-    lozData.info = '<b>' + lozData.message.replace(/info string debug /, '') + '</b>';
-    lozUpdateInfo();
+    lozData.debug = '<b>' + lozData.message.replace(/info string debug /, '') + '</b>';
+    lozUpdateDebug();
   }
 
   // info string
@@ -82,6 +82,10 @@ lozStandardRx = function(e) {
     lozData.board = lozGetStr('board', '');
     lozNewBoard();
   }
+  else if(lozData.tokens[0] == 'id') {
+  }
+  else if(lozData.tokens[0] == 'uciok') {
+  }
 
   //  everything else
   else {
@@ -92,6 +96,11 @@ lozStandardRx = function(e) {
 };
 
 lozUpdateBestMove = function() {
+
+  if(lozData.thinkOnly) {
+    $(lozData.idInfo).addClass('ended');
+    return;
+  }
 
   var move = chess.move({
     from: lozData.bmFr,
@@ -122,21 +131,30 @@ function lozUpdatePV() {
 
   if(!lozData.showPV) return;
 
+  var d;
+  if(lozData.selDepth)
+    d = lozData.depth + '/' + lozData.selDepth;
+  else
+    d = lozData.depth;
+
+  var score = lozData.score / 100;
+  if(chess.turn() === 'b') score = -score;
+
   if(lozData.detailedPV) {
     if(lozData.units == 'cp')
-      $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (' + lozData.score + ') ' + lozData.pv + '<br>');
+      $(lozData.idInfo).prepend('depth ' + d + ' (' + lozData.score + ') ' + lozData.pv + '<br>');
     else if(lozData.score > 0)
-      $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (<b>mate in ' + lozData.score + '</b>) ' + lozData.pv + '<br>');
+      $(lozData.idInfo).prepend('depth ' + d + ' (<b>mate in ' + lozData.score + '</b>) ' + lozData.pv + '<br>');
     else
-      $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (<b>checkmate</b>) ' + lozData.pv + '<br>');
+      $(lozData.idInfo).prepend('depth ' + d + ' (<b>checkmate</b>) ' + lozData.pv + '<br>');
   }
   else {
     if(lozData.units == 'cp')
-      $(lozData.idInfo).html('depth ' + lozData.depth + ', ' + ' white score: ' + -lozData.score/100);
+      $(lozData.idInfo).html('depth ' + d + ', ' + ' white score: ' + score + '<br>');
     else if(lozData.score > 0)
-      $(lozData.idInfo).html('depth ' + lozData.depth + ' (<b>mate in ' + lozData.score + '</b>) ' + lozData.pv + '<br>');
+      $(lozData.idInfo).html('depth ' + d + ' (<b>checkmated in ' + (lozData.score + 1) + '</b>) ' + '<br>');
     else
-      $(lozData.idInfo).html('depth ' + lozData.depth + ' (<b>checkmate</b>) ' + lozData.pv + '<br>');
+      $(lozData.idInfo).html('depth ' + d + ' (<b>mate in ' + (-lozData.score + 1) + '</b>) ' + '<br>');
   }
 }
 
@@ -218,9 +236,21 @@ function getMoveTime() {
 }
 
 lozPlay = function() {
+  console.error('play');
   if(!chess.game_over()) {
-    $(lozData.idInfo).html('');
+    $(lozData.idInfo).html('').removeClass('ended');
+    $(lozData.idDebug).html('');
+
     var movetime = getMoveTime();
+
+    // it is possible that we are already searching a move
+    // so we cancel the current worker (Lozza can not respond to 'stop' while searching)
+    if(engine) engine.terminate();
+    engine = new Worker(lozData.source);
+    engine.onmessage = lozStandardRx;
+    engine.postMessage('uci');
+    engine.postMessage('ucinewgame');
+    engine.postMessage('debug off');
     engine.postMessage('position startpos moves ' + strMoves());
     engine.postMessage('go movetime ' + movetime);
   }
@@ -228,25 +258,19 @@ lozPlay = function() {
 };
 
 lozInit = function(options) {
-  console.log('lozInit');
+  console.log('** lozInit **', 'autoplay:', options.autoplay, 'engine:', lozData.source);
+  if(engine) {
+    engine.terminate();
+    engine = null;
+  }
+
   chess = options.chess;
   board = options.board;
   lozData.autoplay = options.autoplay;
-  console.log('autoplay', lozData.autoplay);
   lozData.defaultThinkTime = options.timePerMove || 1;
   lozData.noDB = options.noDB;
   lozData.onMove = options.onMove;
   lozData.showPV = options.showPV;
-  console.log('engine', lozData.source);
-  //$('input').tooltip({delay: {"show": 1000, "hide": 100}});
-  // when entering a game, it is possible that we are already searching a move
-  // so to avoid receiving a bestmove when not expected, we cancel the current worker
-  if(engine) engine.terminate();
-  engine = new Worker(lozData.source);
-  engine.onmessage = lozStandardRx;
-  engine.postMessage('uci');
-  engine.postMessage('ucinewgame');
-  engine.postMessage('debug off');
-  //engine.postMessage('position startpos');
+  lozData.thinkOnly = options.thinkOnly;
   if(lozData.autoplay) lozPlay();
 };

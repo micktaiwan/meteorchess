@@ -7,6 +7,7 @@ lozData = {
   defaultThinkTime: 2,
   page: 'play.htm',
   idInfo: '#info',
+  idDebug: '#debug',
   idStats: '#stats',
   autoplay: false,
   showPV: true,
@@ -14,9 +15,8 @@ lozData = {
 };
 
 Number.prototype.round = function(places) {
-
   return +(Math.round(this + "e+" + places) + "e-" + places);
-}
+};
 
 lozGetURLArgs = function() {
 
@@ -109,18 +109,12 @@ lozUpdateStats = function() {
   $(lozData.idStats).html(lozData.seconds + ' s | ' + lozData.kilonodes + ' kn | ' + lozData.knps + ' kn/s' + move + hash);
 };
 
-lozUpdatePV = function() {
-
-  if(lozData.selDepth)
-    var d = lozData.depth + '/' + lozData.selDepth;
-  else
-    var d = lozData.depth;
-
-  $(lozData.idInfo).prepend(lozData.seconds + ' ' + d + ' (' + lozData.score + lozData.units + ') ' + lozData.pv + '<br>');
-};
-
 lozUpdateInfo = function() {
   $(lozData.idInfo).prepend(lozData.info + '<br>');
+};
+
+lozUpdateDebug = function() {
+  $(lozData.idDebug).prepend(lozData.debug + '<br>');
 };
 
 lozNewBoard = function() {
