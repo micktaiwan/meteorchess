@@ -107,14 +107,14 @@ lozUpdateBestMove = function() {
     });
     return;
   }
-  board.position(chess.fen());
-  $('#moves').html(chess.pgn({newline_char: '<br>'}));
-
-  if(chess.game_over() && lozData.noDB)
-    showEnd();
-
   if(!lozData.noDB) {
     lozData.onMove(move);
+  }
+  else {
+    board.position(chess.fen());
+    $('#moves').html(chess.pgn({newline_char: '<br>'}));
+    if(chess.game_over() && lozData.noDB)
+      showEnd();
   }
 };
 

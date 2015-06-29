@@ -197,8 +197,7 @@ Template.game.rendered = function() {
   boardEl = $('#board');
 
   // setting history cursor
-  if(!Session.get(HISTORY_PLY))
-    Session.set(HISTORY_PLY, game.ply);
+  Session.set(HISTORY_PLY, 0);
 
   if(Session.get('notif-' + game_id))
     this.$('.getNotif').prop('checked', true);
@@ -231,6 +230,7 @@ Template.game.rendered = function() {
       //game = Games.findOne(game_id);
       var ply = Session.get(HISTORY_PLY);
       if(!rendered || ply === doc.ply - 1) {
+        console.log('ply', ply, doc);
         Session.set(HISTORY_PLY, doc.ply);
         board.position(chess.fen());
       }
@@ -257,10 +257,13 @@ Template.game.rendered = function() {
   Session.set('game' + game._id + '-history', game.ply);
   Meteor.call('gameAddSpectator', game_id, Meteor.userId(), getUserName(Meteor.user()));
   // if playing against computer, starts the game
-  if(!game.ply && isComputerToPlay(chess.turn())) {
+  if(game.ply === 0 && isComputerToPlay(chess.turn())) {
     console.log('starting');
+    drag = false;
     lozPlay();
   }
+  else
+    drag = true;
 };
 
 Template.game.helpers({
@@ -364,6 +367,7 @@ Template.game.events({
   'click .first': function(e, tpl) {
     Session.set(HISTORY_PLY, 0);
     board.position('start');
+    drag = (0 === this.ply);
   },
 
   'click .last': function(e, tpl) {
