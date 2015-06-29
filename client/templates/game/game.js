@@ -274,12 +274,16 @@ Template.game.helpers({
     if(board) { // it's here just to be somewhere, and be reactive depending on user login and mySide changes
       board.orientation(s !== 'b' ? 'white' : 'black');
     }
-    return (s === 'w' || s === 'none') ? this.black.name + ' (' + this.black.elo + ')' : this.white.name + ' (' + this.white.elo + ')';
+    var welo = this.white.elo ? this.white.elo : 1500;
+    var belo = this.black.elo ? this.black.elo : 1500;
+    return (s === 'w' || s === 'none') ? this.black.name + ' (' + belo + ')' : this.white.name + ' (' + welo + ')';
   },
 
   bottomName: function() {
     var s = mySide(this);
-    return (s === 'w' || s === 'none') ? this.white.name + ' (' + this.white.elo + ')' : this.black.name + ' (' + this.black.elo + ')';
+    var welo = this.white.elo ? this.white.elo : 1500;
+    var belo = this.black.elo ? this.black.elo : 1500;
+    return (s === 'w' || s === 'none') ? this.white.name + ' (' + welo + ')' : this.black.name + ' (' + belo + ')';
   },
 
   moves: function() {
