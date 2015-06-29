@@ -9,7 +9,8 @@ lozData = {
   idInfo: '#info',
   idStats: '#stats',
   autoplay: false,
-  showPV: false
+  showPV: true,
+  detailedPV: false
 };
 
 Number.prototype.round = function(places) {
@@ -92,6 +93,8 @@ lozGetStrToEnd = function(key, def) {
 };
 
 lozUpdateStats = function() {
+
+  if(!lozData.updateStats) return;
 
   if(lozData.mvNum && lozData.mvStr)
     var move = ' | ' + lozData.mvNum + '/' + lozData.mvStr;

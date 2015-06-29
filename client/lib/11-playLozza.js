@@ -122,13 +122,22 @@ function lozUpdatePV() {
 
   if(!lozData.showPV) return;
 
-  if(lozData.units == 'cp')
-    $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (' + lozData.score + ') ' + lozData.pv + '<br>');
-  else if(lozData.score > 0)
-    $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (<b>mate in ' + lozData.score + '</b>) ' + lozData.pv + '<br>');
-  else
-    $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (<b>checkmate</b>) ' + lozData.pv + '<br>');
-
+  if(lozData.detailedPV) {
+    if(lozData.units == 'cp')
+      $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (' + lozData.score + ') ' + lozData.pv + '<br>');
+    else if(lozData.score > 0)
+      $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (<b>mate in ' + lozData.score + '</b>) ' + lozData.pv + '<br>');
+    else
+      $(lozData.idInfo).prepend('depth ' + lozData.depth + ' (<b>checkmate</b>) ' + lozData.pv + '<br>');
+  }
+  else {
+    if(lozData.units == 'cp')
+      $(lozData.idInfo).html('depth ' + lozData.depth + ', ' + ' white score: ' + -lozData.score/100);
+    else if(lozData.score > 0)
+      $(lozData.idInfo).html('depth ' + lozData.depth + ' (<b>mate in ' + lozData.score + '</b>) ' + lozData.pv + '<br>');
+    else
+      $(lozData.idInfo).html('depth ' + lozData.depth + ' (<b>checkmate</b>) ' + lozData.pv + '<br>');
+  }
 }
 
 var onDrop = function(source, target, piece, newPos, oldPos, orientation) {
@@ -227,6 +236,7 @@ lozInit = function(options) {
   lozData.defaultThinkTime = options.timePerMove || 1;
   lozData.noDB = options.noDB;
   lozData.onMove = options.onMove;
+  lozData.showPV = options.showPV;
   console.log('engine', lozData.source);
   //$('input').tooltip({delay: {"show": 1000, "hide": 100}});
   // when entering a game, it is possible that we are already searching a move

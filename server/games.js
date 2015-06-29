@@ -17,6 +17,17 @@ var updateElo = function(w, l, result) {
   Meteor.users.update({_id: l._id}, {$set: {elo: lne}});
 };
 
+var doGameCancel = function(id, force) {
+  console.log('cancelling', id);
+  var game = Games.findOne(id);
+  if(!force && game.ply > 5)
+    throw new Meteor.Error('Can not cancel a game with more than 5 plies');
+  Moves.remove({game_id: id});
+  Positions.update({}, {$pull: {games: id}});
+  Chats.remove({gameId: id});
+  return Games.remove({_id: id});
+};
+
 Meteor.methods({
 
   'gameCreate': function(rated, color) {
@@ -81,15 +92,8 @@ Meteor.methods({
   },
 
   'gameCancel': function(id) {
-    console.log('cancelling', id);
     if(!this.userId) throw new Meteor.Error('user not logged');
-    var game = Games.findOne(id);
-    if(game.ply > 5)
-      throw new Meteor.Error('Can not cancel a game with more than 5 plies');
-    Moves.remove({game_id: id});
-    Positions.update({}, {$pull: {games: id}});
-    Chats.remove({gameId: id});
-    return Games.remove({_id: id});
+    return doGameCancel(id);
   },
 
 
@@ -187,6 +191,5 @@ Meteor.methods({
 });
 
 UserStatus.events.on("connectionLogout", function(fields) {
-  console.log(fields);
-  console.log(Games.update({}, {$pull: {spectators: {_id: fields.userId}}}, {multi: true}));
+  Games.update({}, {$pull: {spectators: {_id: fields.userId}}}, {multi: true});
 });

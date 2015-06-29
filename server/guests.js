@@ -9,7 +9,7 @@ Meteor.methods({
 
     // remove old guests
     var before = new Date();
-    before.setHours(before.getHours() - 24*3);
+    before.setHours(before.getHours() - 24 * 3);
     Accounts.removeOldGuests(before);
 
     // remove not started games
@@ -20,6 +20,14 @@ Meteor.methods({
       }
     });
     if(arr.length > 0) Games.remove({_id: {$in: arr}});
+
+    // cancelling games
+/*
+    _.each(Games.find({status: 'playing', $or: [white]}).fetch(), function(g) {
+      doGameCancel(g._id, true);
+    });
+*/
+
   }
 
 });

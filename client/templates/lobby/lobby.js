@@ -15,7 +15,7 @@ Template.lobby.rendered = function() {
     position: 'start'
   });
 
-  lozInit({chess: chess, board: board, autoplay: true, timePerMove: 2, noDB: true});
+  lozInit({chess: chess, board: board, autoplay: true, timePerMove: 2, noDB: true, showPV: false});
 
   Meteor.call('guestsClean');
 

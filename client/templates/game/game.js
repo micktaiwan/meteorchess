@@ -253,7 +253,7 @@ Template.game.rendered = function() {
   });
   rendered = true;
   scrollChat();
-  lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove});
+  lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove, showPV: true});
   Session.set('game' + game._id + '-history', game.ply);
   Meteor.call('gameAddSpectator', game_id, Meteor.userId(), getUserName(Meteor.user()));
   // if playing against computer, starts the game
