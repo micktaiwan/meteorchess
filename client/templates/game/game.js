@@ -230,7 +230,7 @@ Template.game.rendered = function() {
       chess.move(doc.move);
       //game = Games.findOne(game_id);
       var ply = Session.get(HISTORY_PLY);
-      if(!rendered || ply === doc.ply-1) {
+      if(!rendered || ply === doc.ply - 1) {
         Session.set(HISTORY_PLY, doc.ply);
         board.position(chess.fen());
       }
@@ -273,14 +273,13 @@ Template.game.helpers({
     var s = mySide(this);
     if(board) { // it's here just to be somewhere, and be reactive depending on user login and mySide changes
       board.orientation(s !== 'b' ? 'white' : 'black');
-      console.log('oriented');
     }
-    return (s === 'w' || s === 'none') ? this.black.name : this.white.name;
+    return (s === 'w' || s === 'none') ? this.black.name + ' (' + this.black.elo + ')' : this.white.name + ' (' + this.white.elo + ')';
   },
 
   bottomName: function() {
     var s = mySide(this);
-    return (s === 'w' || s === 'none') ? this.white.name : this.black.name;
+    return (s === 'w' || s === 'none') ? this.white.name + ' (' + this.white.elo + ')' : this.black.name + ' (' + this.black.elo + ')';
   },
 
   moves: function() {
@@ -375,7 +374,12 @@ Template.game.events({
     Session.set(HISTORY_PLY, ply);
     if(ply === 0) board.position('start');
     else {
-      var fen = Moves.findOne({game_id: this._id, ply: ply}).fen;
+      var m = Moves.findOne({game_id: this._id, ply: ply});
+      if(!m) {
+        sAlert.error("Can't find ply " + ply + ' of game ' + this._id);
+        return;
+      }
+      var fen = m.fen;
       board.position(fen);
     }
   },

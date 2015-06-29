@@ -2,6 +2,21 @@
  * Created by mfaivremacon on 22/06/15.
  */
 
+var updateElo = function(w, l, result) {
+  var winner = Meteor.users.findOne(w._id);
+  var loser = Meteor.users.findOne(l._id);
+  console.log(w, winner);
+  if(!winner || !loser || winner.profile.guest || loser.profile.guest) return;
+  if(!winner.elo) winner.elo = 1500;
+  if(!loser.elo) loser.elo = 1500;
+  var elo = new Elo();
+  var wne = elo.getNewRating(winner.elo, loser.elo, result);
+  var lne = elo.getNewRating(loser.elo, winner.elo, 1 - result);
+  console.log('Winner', wne, 'Loser', lne);
+  Meteor.users.update({_id: w._id}, {$set: {elo: wne}});
+  Meteor.users.update({_id: l._id}, {$set: {elo: lne}});
+};
+
 Meteor.methods({
 
   'gameCreate': function(rated, color) {
@@ -13,16 +28,20 @@ Meteor.methods({
       user: {_id: this.userId, name: name, type: type},
       status: 'open',
       rated: rated === "true",
+      ply : 0,
       createdAt: new Date()
     };
-    if(color === 'w') _.extend(obj, {white: {_id: this.userId, name: name, type: 'human'}});
-    else _.extend(obj, {black: {_id: this.userId, name: name, type: 'human'}});
+    var elo = u.elo ? u.elo : 1500;
+    var human = {_id: this.userId, name: name, type: 'human', elo: elo};
+    if(color === 'w') _.extend(obj, {white: human});
+    else _.extend(obj, {black: human});
     return Games.insert(obj);
   },
 
   'gameCreateComputer': function(rated, color) {
     if(!this.userId) throw new Meteor.Error('user not logged');
-    var name = getUserName(Meteor.users.findOne(this.userId));
+    var u = Meteor.users.findOne(this.userId);
+    var name = getUserName(u);
     var obj = {
       user: {_id: this.userId, name: name},
       status: 'playing',
@@ -30,13 +49,16 @@ Meteor.methods({
       createdAt: new Date(),
       startedAt: new Date()
     };
+    var elo = u.elo ? u.elo : 1500;
+    var human = {_id: this.userId, name: name, type: 'human', elo: elo};
+    var computer = {_id: 'lozza', name: 'Lozza (C)', type: 'computer'};
     if(color === 'w') _.extend(obj, {
-      white: {_id: this.userId, name: name, type: 'human'},
-      black: {_id: 'lozza', name: 'Lozza (C)', type: 'computer'}
+      white: human,
+      black: computer
     });
     else _.extend(obj, {
-      black: {_id: this.userId, name: name, type: 'human'},
-      white: {_id: 'lozza', name: 'Lozza (C)', type: 'computer'}
+      black: human,
+      white: computer
     });
     return Games.insert(obj);
   },
@@ -44,17 +66,19 @@ Meteor.methods({
   'gameAccept': function(id) {
     console.log('accepting', id);
     if(!this.userId) throw new Meteor.Error('user not logged');
-    var name = getUserName(Meteor.users.findOne(this.userId));
+    var u = Meteor.users.findOne(this.userId);
+    var name = getUserName(u);
     var game = Games.findOne(id);
     var obj = {
       status: 'playing',
       startedAt: new Date()
     };
-    if(game.white) _.extend(obj, {black: {_id: this.userId, name: name, type: 'human'}});
-    else _.extend(obj, {white: {_id: this.userId, name: name, type: 'human'}});
+    var elo = u.elo ? u.elo : 1500;
+    var human = {_id: this.userId, name: name, type: 'human', elo: elo};
+    if(game.white) _.extend(obj, {black: human});
+    else _.extend(obj, {white: human});
     return Games.update({_id: id}, {$set: obj});
   },
-
 
   'gameCancel': function(id) {
     console.log('cancelling', id);
@@ -92,23 +116,28 @@ Meteor.methods({
     // game ended ?
     var result = undefined, text = undefined;
     if(status) { // game ended
+      var game = Games.findOne(game_id);
       var winner = undefined, loser = undefined, win_color = undefined;
       if(status === 'checkmate') {
-        var game = Games.findOne(game_id);
         if(to_play === 'w') {
           loser = game.white;
           winner = game.black;
           text = "Black won";
           win_color = "b";
+          updateElo(game.black, game.white, 1);
         }
         else {
           loser = game.black;
           winner = game.white;
           text = "White won";
           win_color = "w";
+          updateElo(game.white, game.black, 1);
         }
       }
-      else text = "Game was drawn";
+      else {
+        text = "Game was drawn";
+        updateElo(game.white, game.black, 0.5);
+      }
       result = {status: status, text: text, winner: winner, loser: loser, win_color: win_color}
     }
 
@@ -130,12 +159,14 @@ Meteor.methods({
       winner = game.black;
       win_color = "b";
       text = "White resigned";
+      updateElo(game.black, game.white, 1);
     }
     else {
       loser = game.black;
       winner = game.white;
       win_color = "w";
       text = "Black resigned";
+      updateElo(game.white, game.black, 1);
     }
 
     return Games.update({_id: id}, {
