@@ -40,6 +40,7 @@ Meteor.methods({
       status: 'open',
       rated: rated === "true",
       ply : 0,
+      to_play: 'w',
       createdAt: new Date()
     };
     var elo = u.elo ? u.elo : 1500;
