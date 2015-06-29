@@ -8,7 +8,7 @@ Meteor.methods({
     if(!this.userId) throw new Meteor.Error('user not logged');
     var u = Meteor.users.findOne(this.userId);
     var name = getUserName(u);
-    var type =  (u.profile && u.profile.guest) ? 'guest' : 'member';
+    var type = (u.profile && u.profile.guest) ? 'guest' : 'member';
     var obj = {
       user: {_id: this.userId, name: name, type: type},
       status: 'open',
@@ -144,6 +144,18 @@ Meteor.methods({
         result: {status: 'resigned', text: text, winner: winner, loser: loser, win_color: win_color}
       }
     });
-  }
+  },
 
+  'gameAddSpectator': function(g_id, u_id, name) {
+    return Games.update({_id: g_id}, {$push: {spectators: {_id: u_id, name: name}}});
+  },
+
+  'gameRemoveSpectator': function(g_id, u_id) {
+    return Games.update({_id: g_id}, {$pull: {spectators: {_id: u_id}}});
+  }
+});
+
+UserStatus.events.on("connectionLogout", function(fields) {
+  console.log(fields);
+  console.log(Games.update({}, {$pull: {spectators: {_id: fields.userId}}}, {multi: true}));
 });

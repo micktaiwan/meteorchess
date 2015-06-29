@@ -184,6 +184,7 @@ var mePlayed = function(move) {
 Template.game.onDestroyed(function() {
   if(onChangeHandle) onChangeHandle.stop();
   rendered = false;
+  Meteor.call('gameRemoveSpectator', game_id, Meteor.userId());
 });
 
 Template.game.rendered = function() {
@@ -254,6 +255,7 @@ Template.game.rendered = function() {
   scrollChat();
   lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove});
   Session.set('game' + game._id + '-history', game.ply);
+  Meteor.call('gameAddSpectator', game_id, Meteor.userId(), getUserName(Meteor.user()));
   // if playing against computer, starts the game
   if(!game.ply && isComputerToPlay(chess.turn())) {
     console.log('starting');
@@ -388,6 +390,5 @@ Template.game.events({
     var fen = Moves.findOne({game_id: this._id, ply: ply}).fen;
     board.position(fen);
   }
-
 
 });

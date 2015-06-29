@@ -19,6 +19,12 @@
           <button type="submit" class="btn btn-primary btn-xs">Send</button>
         </form>
       </div>
+      <div class="spectators">
+        Spectators:
+        {{#each spectators}}
+          <span>{{name}}</span>
+        {{/each}}
+      </div>
       <input type="checkbox" class="getNotif"> Get desktop notifications for this game moves
 
     </div>
