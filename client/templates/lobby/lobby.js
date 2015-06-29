@@ -22,6 +22,7 @@ Template.lobby.rendered = function() {
 };
 
 Template.lobby.helpers({
+
   usersOnline: function() {
     return Meteor.users.find({"status.online": true}, {
       sort: {
@@ -29,6 +30,10 @@ Template.lobby.helpers({
         "status.lastLogin.date": -1
       }
     });
+  },
+
+  rankings: function() {
+    return Meteor.users.find({'profile.guest': {$ne: true}, 'elo': {$ne: undefined}}, {sort: {elo: -1}});
   },
 
   guestname: function() {
@@ -82,3 +87,5 @@ Template.onlineUser.helpers({
   }
 
 });
+
+Template.ranking.helpers({});

@@ -9,6 +9,14 @@
           {{> onlineUser}}
         {{/each}}
       </div>
+
+      <div class="rankings">
+        <h2>Rankings</h2>
+        {{#each rankings}}
+          {{> ranking}}
+        {{/each}}
+      </div>
+
     </div>
 
     <div class="col-xs-5">
@@ -24,5 +32,18 @@
 </template>
 
 <template name="onlineUser">
-  <div class="online-user {{onlineClass}}">{{name}} {{guestSign}}</div>
+  <div class="online-user {{onlineClass}}">{{userName}} {{guestSign}}</div>
+</template>
+
+<template name="ranking">
+  <div class="ranking">
+    <div class="row">
+      <div class="col-xs-8">
+        {{userName}}
+      </div>
+      <div class="col-xs-4">
+        {{elo}}
+      </div>
+    </div>
+  </div>
 </template>

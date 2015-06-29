@@ -36,3 +36,7 @@ Meteor.startup(function() {
   });
 
 });
+
+Template.registerHelper('userName', function() {
+  return getUserName(this);
+});

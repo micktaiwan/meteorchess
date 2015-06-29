@@ -313,17 +313,21 @@ Template.game.helpers({
 
   'nextButtonDisabled': function() {
     var ply = Session.get(HISTORY_PLY);
-    return ply >= this.ply ? 'disabled' : '';
+    return !this.ply || ply >= this.ply ? 'disabled' : '';
   },
 
   'prevButtonDisabled': function() {
     var ply = Session.get(HISTORY_PLY);
-    return ply <= 0 ? 'disabled' : '';
+    return !this.ply || ply <= 0 ? 'disabled' : '';
   },
 
   'hideIfLastMove': function() {
     var ply = Session.get(HISTORY_PLY);
-    return ply >= this.ply ? 'hidden' : '';
+    return !this.ply || ply >= this.ply ? 'hidden' : '';
+  },
+
+  'getPly': function() {
+    return Session.get(HISTORY_PLY) + '/' + this.ply;
   }
 
 });

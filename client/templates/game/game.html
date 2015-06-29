@@ -49,6 +49,8 @@
         <button class="btn btn-default btn-xs next" {{nextButtonDisabled}}>&gt;</button>
         <button class="btn btn-default btn-xs last" {{nextButtonDisabled}}>&gt;&gt;</button>
       </div>
+
+      <span class="{{hideIfLastMove}}">Ply: {{getPly}}</span>
       <div class="history-alert {{hideIfLastMove}}">Navigating in history</div>
 
       <div class="btn-toolbar action-buttons" role="toolbar">
