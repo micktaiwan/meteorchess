@@ -19,6 +19,11 @@ Template.lobby.rendered = function() {
 
   Meteor.call('guestsClean');
 
+  if(Session.get('cancelled')) {
+    Session.set('cancelled', false);
+    sAlert.info('Game has been cancelled by your opponent');
+  }
+
 };
 
 Template.lobby.helpers({

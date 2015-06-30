@@ -249,7 +249,7 @@ Template.game.rendered = function() {
       if(rendered && Session.get('notif-' + game_id) && !mePlayed(doc.move)) {
         new Notification(game.white.name + " - " + game.black.name, {
           body: doc.move.san,
-          icon: "http://learningchess.meteor.com/img/chesspieces/wikipedia/wN.png",
+          icon: "http://learnchess.meteor.com/img/chesspieces/wikipedia/wN.png",
           tag: game_id
         }).onclick = function(e) {
           window.focus();
@@ -331,7 +331,7 @@ Template.game.helpers({
 
   'cancelHidden': function() {
     if(this.status === 'ended') return 'hidden';
-    if(this.ply > 5) return 'hidden';
+    if(this.ply > 3) return 'hidden';
     return (this.white._id !== Meteor.userId() && this.black._id !== Meteor.userId()) ? 'hidden' : '';
   },
 
@@ -436,8 +436,8 @@ Template.game.events({
     if(confirm('Cancel this game ?')) {
       Meteor.call('gameCancel', id, function(err, rv) {
         if(err) sAlert.error(err.error);
-        else Router.go('lobby');
       });
+      Router.go('lobby');
     }
   }
 

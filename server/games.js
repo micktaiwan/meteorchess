@@ -20,8 +20,8 @@ var updateElo = function(w, l, result) {
 var doGameCancel = function(id, force) {
   console.log('cancelling', id);
   var game = Games.findOne(id);
-  if(!force && game.ply > 5)
-    throw new Meteor.Error('Can not cancel a game with more than 5 plies');
+  if(!force && game.ply > 3)
+    throw new Meteor.Error('Can not cancel a game with more than 3 plies');
   Moves.remove({game_id: id});
   Positions.update({}, {$pull: {games: id}});
   Chats.remove({gameId: id});
