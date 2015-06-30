@@ -276,16 +276,15 @@ Template.game.rendered = function() {
   Session.set('game' + game._id + '-history', game.ply);
   Meteor.call('gameAddSpectator', game_id, Meteor.userId(), getUserName(Meteor.user()));
 
-  drag = false;
+  drag = true;
   // if playing against computer, starts the game
   if(game.ply === 0 && isComputerToPlay(chess.turn())) {
     console.log('starting');
     lozPlay();
+    drag = false;
   }
   else if(!opponentIsComputer())
     think();
-  else
-    drag = true;
 };
 
 Template.game.helpers({
