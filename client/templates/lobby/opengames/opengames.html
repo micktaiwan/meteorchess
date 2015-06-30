@@ -1,6 +1,7 @@
 <template name="openGames">
 
   <h2>Current Games</h2>
+
   <div class="games">
     {{#each playingGames}}
       {{> playingGame }}
@@ -8,6 +9,7 @@
   </div>
 
   <h2>Challenges</h2>
+
   <div class="games">
     {{#each openGames}}
       {{> openGame }}
@@ -15,12 +17,12 @@
   </div>
 
   <h2>Ended games</h2>
+
   <div class="games">
     {{#each endedGames}}
       {{> playingGame }}
     {{/each}}
   </div>
-
 
 </template>
 
@@ -38,8 +40,11 @@
 <template name="playingGame">
 
   <div class="game {{meToPlayClass}}">
-    <button class="btn btn-default btn-xs open {{myGameClass}}">Open</button>
-    <div class="players">{{white.name}} - {{black.name}}</div>
+    <a href="/game/{{_id}}" class="btn btn-default btn-xs open {{myGameClass}}">Open</a>
+
+    <div class="players">
+      <a href="/account/{{white.name}}">{{white.name}}</a> - <a href="/account/{{black.name}}">{{black.name}}</a>
+    </div>
     <button class="btn btn-warning btn-xs cancel {{cancelHidden}}"><i class="fa fa-close"></i> Cancel</button>
     <span class="date" data-livestamp="{{lastMovedAt}}"></span>
   </div>

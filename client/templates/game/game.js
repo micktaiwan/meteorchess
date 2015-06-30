@@ -273,7 +273,6 @@ Template.game.rendered = function() {
       thinkOnly: true
     });
 
-  Session.set('game' + game._id + '-history', game.ply);
   Meteor.call('gameAddSpectator', game_id, Meteor.userId(), getUserName(Meteor.user()));
 
   drag = true;
@@ -315,15 +314,11 @@ Template.game.helpers({
       return m.san + " ";
     });
   },
-  fen: function() {
-    return this.fen;
-  },
-  pgn: function() {
-    return this.pgn;
-  },
+
   hiddenIfEnded: function() {
     return this.status === 'ended' ? 'hidden' : '';
   },
+
   resignClass: function() {
     if(this.status !== 'ended' && mySide(this) !== 'none') return '';
     return 'hidden';

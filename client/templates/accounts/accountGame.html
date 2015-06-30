@@ -1,0 +1,32 @@
+<template name="accountGame">
+
+  <div class="accountGame">
+    <div class="row">
+      <div class="col-xs-3">
+        <div class="game-container">
+          <div class="playerName">{{topName }}</div>
+          <div class="board-container">
+            <div id="board-{{_id}}"></div>
+          </div>
+          <div class="playerName">{{bottomName }}</div>
+
+        </div>
+      </div>
+
+      <div class="col-xs-9">
+        <a href="/game/{{_id}}" class="btn btn-default btn-xs open {{myGameClass}}">Open</a>
+        <div class="players">
+          <a href="/account/{{white.name}}">{{white.name}}</a> - <a href="/account/{{black.name}}">{{black.name}}</a>
+        </div>
+        <div class="game-status">{{result.text}}</div>
+        <div>Game started <span class="date" data-livestamp="{{startedAt}}"></span></div>
+        <div>Last move <span class="date" data-livestamp="{{lastMovedAt}}"></span></div>
+        <div id="status" class="game-status {{hiddenIfEnded}}"></div>
+
+        <div>FEN: {{fen}}</div>
+        <div class="pgn">{{pgn}}</div>
+      </div>
+    </div>
+  </div>
+
+</template>

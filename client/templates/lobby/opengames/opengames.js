@@ -13,7 +13,7 @@ Template.openGames.helpers({
   },
 
   'endedGames': function() {
-    return Games.find({status: 'ended'}, {sort: {lastMovedAt: -1, createdAt:-1}, limit: 10});
+    return Games.find({status: 'ended'}, {sort: {lastMovedAt: -1, createdAt: -1}, limit: 10});
   }
 });
 
@@ -53,7 +53,6 @@ Template.playingGame.helpers({
 
 });
 
-
 Template.openGame.events({
 
   'click .accept': function(e) {
@@ -71,11 +70,7 @@ Template.openGame.events({
 
 });
 
-
 Template.playingGame.events({
 
-  'click .open': function() {
-    Router.go('game', {id: this._id});
-  }
 
 });

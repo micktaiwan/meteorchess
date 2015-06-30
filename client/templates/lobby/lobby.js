@@ -23,6 +23,10 @@ Template.lobby.rendered = function() {
     Session.set('cancelled', false);
     sAlert.info('Game has been cancelled by your opponent');
   }
+  if(Session.get('user_do_not_exist')) {
+    Session.set('user_do_not_exist', false);
+    sAlert.info('No account for this name');
+  }
 
 };
 

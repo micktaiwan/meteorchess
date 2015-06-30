@@ -10,6 +10,15 @@ Meteor.publish('users', function() {
   return Meteor.users.find();
 });
 
+/*
+ Meteor.publish('user', function(id) {
+ return Meteor.users.find({_id: id});
+ });
+ */
+
+Meteor.publish('user-games', function(id) {
+  return Games.find({$or: [{'white._id': id}, {'black._id': id}], fen: {$ne: undefined}}); // filter out games with no moves
+});
 
 Meteor.publish('game', function(id) {
   return Games.find({_id: id});

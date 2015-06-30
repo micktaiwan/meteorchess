@@ -1,0 +1,14 @@
+<template name="account">
+
+  <h1>{{userName}}</h1>
+
+  <div class="elo">Elo: {{elo}}</div>
+  <div class="gamesCount">{{ gamesCount }} games</div>
+
+  <div class="account-games">
+    {{#each games}}
+        {{> accountGame }}
+    {{/each}}
+  </div>
+
+</template>

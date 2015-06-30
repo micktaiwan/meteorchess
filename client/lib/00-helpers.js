@@ -37,6 +37,7 @@ Meteor.startup(function() {
 
 });
 
-Template.registerHelper('userName', function() {
-  return getUserName(this);
+Template.registerHelper('userName', function(user) {
+  if(!user) user = this;
+  return getUserName(user);
 });
