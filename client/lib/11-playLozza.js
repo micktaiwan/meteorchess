@@ -236,7 +236,7 @@ function getMoveTime() {
 }
 
 lozPlay = function() {
-  console.error('play');
+
   if(!chess.game_over()) {
     $(lozData.idInfo).html('').removeClass('ended');
     $(lozData.idDebug).html('');

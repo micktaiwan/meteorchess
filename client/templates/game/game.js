@@ -262,17 +262,28 @@ Template.game.rendered = function() {
   if(opponentIsComputer())
     lozInit({chess: chess, board: board, autoplay: false, timePerMove: 2, onMove: onMove, showPV: true});
   else
-    lozInit({chess: chess, board: board, autoplay: false, timePerMove: 10, onMove: think, showPV: true, noDB: true, thinkOnly: true});
+    lozInit({
+      chess: chess,
+      board: board,
+      autoplay: false,
+      timePerMove: 10,
+      onMove: think,
+      showPV: true,
+      noDB: true,
+      thinkOnly: true
+    });
 
   Session.set('game' + game._id + '-history', game.ply);
   Meteor.call('gameAddSpectator', game_id, Meteor.userId(), getUserName(Meteor.user()));
 
+  drag = false;
   // if playing against computer, starts the game
   if(game.ply === 0 && isComputerToPlay(chess.turn())) {
     console.log('starting');
-    drag = false;
     lozPlay();
   }
+  else if(!opponentIsComputer())
+    think();
   else
     drag = true;
 };
