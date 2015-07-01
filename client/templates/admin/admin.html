@@ -20,7 +20,18 @@
 </template>
 
 <template name="onlineUserAdmin">
-  <div class="online-user {{onlineClass}}"><a href="/account/{{userName}}">{{userName}}</a> {{guestSign}} {{elo}}</div>
+
+  <div class="row highlight">
+    <div class="col-xs-10">
+      <div class="online-user {{onlineClass}}">
+        <a href="/account/{{userName}}">{{userName}}</a> {{guestSign}} {{elo}}
+      </div>
+    </div>
+    <div class="col-xs-2">
+      <button class="btn btn-danger delete btn-xs" title="Delete"><i class="fa fa-trash-o"></i></button>
+    </div>
+  </div>
+
 </template>
 
 <template name="addComputer">

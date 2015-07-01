@@ -16,7 +16,7 @@ var updateElo = function(w, l, result) {
   Meteor.users.update({_id: l._id}, {$set: {elo: lne}, $push: {eloProgression: {date: new Date(), elo: lne}}});
 };
 
-var doGameCancel = function(id, force) {
+doGameCancel = function(id, force) {
   console.log('cancelling', id);
   var game = Games.findOne(id);
   if(!force && game.ply > 3)

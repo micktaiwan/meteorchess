@@ -14,6 +14,16 @@ Template.admin.helpers({
 
 });
 
+Template.admin.events({
+
+  'click .delete': function() {
+    Meteor.call('usersRemove', this._id, function(err) {
+      if(err) sAlert.error(err.error);
+    });
+  }
+
+});
+
 Template.addComputer.events({
 
   'submit': function(e, tpl) {
