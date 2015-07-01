@@ -1,13 +1,18 @@
 <template name="account">
 
-  <h1>{{userName}}</h1>
-
-  <div class="elo">Elo: {{elo}}</div>
-  <div class="gamesCount">{{ gamesCount }} games</div>
-
+  <div class="row">
+    <div class="col-xs-3">
+      <h1>{{userName}}</h1>
+      <div class="elo">Elo: {{elo}}</div>
+      <div class="gamesCount">{{ gamesCount }} games</div>
+    </div>
+    <div class="col-xs-9">
+      <div id="chartElo"></div>
+    </div>
+  </div>
   <div class="account-games">
     {{#each games}}
-        {{> accountGame }}
+      {{> accountGame }}
     {{/each}}
   </div>
 

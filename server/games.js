@@ -5,16 +5,15 @@
 var updateElo = function(w, l, result) {
   var winner = Meteor.users.findOne(w._id);
   var loser = Meteor.users.findOne(l._id);
-  console.log(w, winner);
   if(!winner || !loser || winner.profile.guest || loser.profile.guest) return;
+
   if(!winner.elo) winner.elo = 1500;
   if(!loser.elo) loser.elo = 1500;
   var elo = new Elo();
   var wne = elo.getNewRating(winner.elo, loser.elo, result);
   var lne = elo.getNewRating(loser.elo, winner.elo, 1 - result);
-  console.log('Winner', wne, 'Loser', lne);
-  Meteor.users.update({_id: w._id}, {$set: {elo: wne}});
-  Meteor.users.update({_id: l._id}, {$set: {elo: lne}});
+  Meteor.users.update({_id: w._id}, {$set: {elo: wne}, $push: {eloProgression: {date: new Date(), elo: wne}}});
+  Meteor.users.update({_id: l._id}, {$set: {elo: lne}, $push: {eloProgression: {date: new Date(), elo: lne}}});
 };
 
 var doGameCancel = function(id, force) {
