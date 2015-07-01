@@ -1,0 +1,33 @@
+<template name="adminSetUp">
+  Please wait
+</template>
+
+<template name="admin">
+
+  <div class="row">
+    <div class="col-xs-3">
+      <div class="online-users">
+        {{#each users}}
+          {{> onlineUserAdmin}}
+        {{/each}}
+      </div>
+    </div>
+    <div class="col-xs-9">
+      {{>addComputer}}
+    </div>
+  </div>
+
+</template>
+
+<template name="onlineUserAdmin">
+  <div class="online-user {{onlineClass}}"><a href="/account/{{userName}}">{{userName}}</a> {{guestSign}} {{elo}}</div>
+</template>
+
+<template name="addComputer">
+  <form class="form-inline">
+    <input id="name" class="form-control input-sm" placeholder="Name"/>
+    <input id="id" class="form-control input-sm" placeholder="DB Identifier"/>
+    <input id="elo" class="form-control input-sm" value="2000" placeholder="Elo" size="4"/>
+    <button type="submit" class="btn btn-primary btn-xs">Add computer</button>
+  </form>
+</template>

@@ -79,21 +79,6 @@ Template.lobby.events({
 
 Template.onlineUser.helpers({
 
-  onlineClass: function() {
-    if(!this.status) return "offline";
-    if(this.status.idle) return "idle";
-    if(this.status.online) return "online";
-    return "offline";
-  },
-
-  name: function() {
-    return getUserName(this);
-  },
-
-  guestSign: function() {
-    if(this.profile && this.profile.guest) return '(guest)';
-    return '';
-  }
 
 });
 

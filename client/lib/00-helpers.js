@@ -41,3 +41,16 @@ Template.registerHelper('userName', function(user) {
   if(!user) user = this;
   return getUserName(user);
 });
+
+Template.registerHelper('onlineClass', function() {
+  if(!this.status) return "offline";
+  if(this.status.idle) return "idle";
+  if(this.status.online) return "online";
+  return "offline";
+});
+
+Template.registerHelper('guestSign', function() {
+  if(this.profile && this.profile.guest) return '(guest)';
+  return '';
+});
+
