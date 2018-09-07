@@ -2,11 +2,17 @@
  * Created by mfaivremacon on 22/06/15.
  */
 
-Template.lobby.rendered = function() {
+Template.lobby.onCreated(function() {
+  this.subscribe("all-games");
+  this.subscribe('users');
+});
 
-  var chess = new Chess();
+Template.lobby.onRendered(function() {
 
-  var board = new ChessBoard('board', {
+
+  const chess = new Chess();
+
+  const board = new ChessBoard('board', {
     showNotation: false,
     //draggable: true,
     //dropOffBoard: 'snapback',
@@ -28,7 +34,7 @@ Template.lobby.rendered = function() {
     sAlert.info('No account for this name');
   }
 
-};
+});
 
 Template.lobby.helpers({
 
@@ -46,7 +52,7 @@ Template.lobby.helpers({
   },
 
   guestname: function() {
-    var u = Meteor.user();
+    const u = Meteor.user();
     if(u.profile && u.profile.guest)
       return 'Guest name:<br/><b>' + Meteor.user().username + '</b><br/>Sign in to keep your games';
     return '<b>Online users</b>';
@@ -68,7 +74,7 @@ Template.lobby.events({
 
   'click .cancel': function(e) {
     e.stopPropagation();
-    var id = this._id;
+    const id = this._id;
     console.log('cancel', id);
     Meteor.call('gameCancel', id, function(err, rv) {
       if(err) sAlert.error(err.error);
@@ -77,9 +83,6 @@ Template.lobby.events({
 
 });
 
-Template.onlineUser.helpers({
-
-
-});
+Template.onlineUser.helpers({});
 
 Template.ranking.helpers({});

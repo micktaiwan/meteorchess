@@ -2,7 +2,7 @@
  * Created by mfaivremacon on 22/06/15.
  */
 
-Meteor.publish('games', function() {
+Meteor.publish('all-games', function() {
   return Games.find({}); // FIXME
 });
 
@@ -17,7 +17,7 @@ Meteor.publish('users', function() {
  */
 
 Meteor.publish('user-games', function(id) {
-  return Games.find({$or: [{'white._id': id}, {'black._id': id}], fen: {$ne: undefined}}); // filter out games with no moves
+  return Games.find({$or: [{'white._id': id}, {'black._id': id}]});
 });
 
 Meteor.publish('game', function(id) {

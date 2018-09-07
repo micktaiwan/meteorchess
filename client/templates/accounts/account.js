@@ -10,7 +10,6 @@ var displayEloProgression = function(eloProgression) {
     return;
   }
 
-  //Donnees.find({hard_id: hard_id, cle: cle, date: {$gt: dateAfter}}, {sort: {date: 1}}).fetch();
   var elo = [];
   _.map(eloProgression, function(p) {elo.push([p.date, p.elo])});
   var title = "Elo";
@@ -30,11 +29,18 @@ var displayEloProgression = function(eloProgression) {
 
 };
 
-Template.account.rendered = function() {
+
+Template.account.onCreated(function() {
+
+  this.subscribe("user-games", Meteor.userId());
+
+});
+
+Template.account.onRendered(function() {
 
   displayEloProgression(this.data.eloProgression);
 
-};
+});
 
 
 Template.account.helpers({
