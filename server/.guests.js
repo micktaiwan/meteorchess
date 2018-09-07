@@ -3,6 +3,8 @@
  */
 
 
+// THIS FILE IS IGNORED
+
 Meteor.methods({
 
   'guestsClean': function() {
@@ -22,11 +24,11 @@ Meteor.methods({
     if(arr.length > 0) Games.remove({_id: {$in: arr}});
 
     // cancelling games
-/*
-    _.each(Games.find({status: 'playing', $or: [white]}).fetch(), function(g) {
-      doGameCancel(g._id, true);
-    });
-*/
+    /*
+        _.each(Games.find({status: 'playing', $or: [white]}).fetch(), function(g) {
+          doGameCancel(g._id, true);
+        });
+    */
 
   }
 

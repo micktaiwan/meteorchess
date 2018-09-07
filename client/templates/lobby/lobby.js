@@ -17,7 +17,7 @@ Template.lobby.rendered = function() {
 
   lozInit({chess: chess, board: board, autoplay: true, timePerMove: 2, noDB: true, showPV: false});
 
-  Meteor.call('guestsClean');
+  // Meteor.call('guestsClean');
 
   if(Session.get('cancelled')) {
     Session.set('cancelled', false);
